@@ -1,0 +1,2134 @@
+
+with vw_liberacion as (
+
+select 
+order_id,
+ country_id,
+  created_at,
+trim(params:key,'"') as reasonid,
+trim(params:reason:label,'"') as reasondesc,
+trim(params:agent_email,'"') as agent_email,
+params
+from (--no-cache
+SELECT * FROM (
+  
+  
+  select id,'co' as country_id,order_id,type,params,created_at,
+DATEADD(hour, -5,created_at) as created_at_co_order
+from co_core_orders_public.order_modifications
+where coalesce(_fivetran_deleted,false) <> true
+and created_at::date >= (dateadd(day, -7, (dateadd(hour, 0, current_timestamp()::date))))
+          
+              
+              )
+UNION ALL
+SELECT * FROM (select id,'mx' as country_id,order_id,type,params,created_at,
+DATEADD(hour, -5,created_at) as created_at_co_order
+from mx_core_orders_public.order_modifications
+where coalesce(_fivetran_deleted,false) <> true
+and created_at::date >= (dateadd(day, -7, (dateadd(hour, 0, current_timestamp()::date)))))
+UNION ALL
+SELECT * FROM (select id,'ar' as country_id,order_id,type,params,created_at,
+DATEADD(hour, -5,created_at) as created_at_co_order
+from ar_core_orders_public.order_modifications
+where coalesce(_fivetran_deleted,false) <> true
+and created_at::date >= (dateadd(day, -7, (dateadd(hour, 0, current_timestamp()::date)))))
+UNION ALL
+SELECT * FROM (select id,'cl' as country_id,order_id,type,params,created_at,
+DATEADD(hour, -5,created_at) as created_at_co_order
+from cl_core_orders_public.order_modifications
+where coalesce(_fivetran_deleted,false) <> true
+and created_at::date >= (dateadd(day, -7, (dateadd(hour, 0, current_timestamp()::date)))))
+UNION ALL
+SELECT * FROM (select id,'uy' as country_id,order_id,type,params,created_at,
+DATEADD(hour, -5,created_at) as created_at_co_order
+from uy_core_orders_public.order_modifications
+where coalesce(_fivetran_deleted,false) <> true
+and created_at::date >= (dateadd(day, -7, (dateadd(hour, 0, current_timestamp()::date)))))
+UNION ALL
+SELECT * FROM (select id,'pe' as country_id,order_id,type,params,created_at,
+DATEADD(hour, -5,created_at) as created_at_co_order
+from pe_core_orders_public.order_modifications
+where coalesce(_fivetran_deleted,false) <> true
+and created_at::date >= (dateadd(day, -7, (dateadd(hour, 0, current_timestamp()::date)))))
+UNION ALL
+SELECT * FROM (select id,'cr' as country_id,order_id,type,params,created_at,
+DATEADD(hour, -5,created_at) as created_at_co_order
+from cr_core_orders_public.order_modifications
+where coalesce(_fivetran_deleted,false) <> true
+and created_at::date >= (dateadd(day, -7, (dateadd(hour, 0, current_timestamp()::date)))))
+UNION ALL
+SELECT *FROM (select id,'ec' as country_id,order_id,type,params,created_at,
+DATEADD(hour, -5,created_at) as created_at_co_order
+from ec_core_orders_public.order_modifications
+where coalesce(_fivetran_deleted,false) <> true
+and created_at::date >= (dateadd(day, -7, (dateadd(hour, 0, current_timestamp()::date)))))
+UNION ALL
+SELECT * FROM (select id,'br' as country_id,order_id,type,params,created_at,
+DATEADD(hour, -5,created_at) as created_at_co_order
+from br_core_orders_public.order_modifications
+where coalesce(_fivetran_deleted,false) <> true
+and created_at::date  >= (dateadd(day, -7, (dateadd(hour, 0, current_timestamp()::date)))))
+
+) as vw_order_modifications
+where 
+  
+trim(params:reason:key,'"')::text in (
+
+  'rt_without_product',
+'too_big_or_inadequate_vehicle',
+'dispersion_issues',
+'rt_fraud',
+'earning_issues',
+'address_problems',
+'rt_minor_distance_issue',
+'rt_no_answer',
+'rt_earnings',
+'rt_wont_continue',
+'rt_cant_remember_pass',
+'rt_no_bag',
+--'rt_doesn't_have_card',
+'rt_doesn_t_have_card',
+'dispositive_issues',
+'blocked_card',
+'store_closed',
+'store_delayed',
+'turbo',
+'some_accident',
+'rt_vehicle'
+)
+  
+/* or 
+  
+  trim(params:reason:label,'"')::text in ('RT no tiene tarjeta para pagar'
+,'RT não tem cartão para pagar'
+,'RT doesn´t have a card to pay')
+*/
+),
+
+rt_entragorn_productos as (
+
+  
+select 
+order_id,
+ country_id,
+  created_at,
+  type,
+trim(params:key,'"') as reasonid,
+trim(params:reason:label,'"') as reasondesc,
+trim(params:agent_email,'"') as agent_email,
+params,
+storekeeper_id
+from (--no-cache
+SELECT * FROM ( select distinct id,'co' as country_id,order_id,type,params,created_at,
+DATEADD(hour, -5,created_at) as created_at_co_order,storekeeper_id
+from co_core_orders_public.order_modifications
+where coalesce(_fivetran_deleted,false) <> true
+and created_at::date >= (dateadd(day, -7, (dateadd(hour, 0, current_timestamp()::date)))))
+UNION ALL
+SELECT * FROM (select distinct id,'mx' as country_id,order_id,type,params,created_at,
+DATEADD(hour, -5,created_at) as created_at_co_order,storekeeper_id
+from mx_core_orders_public.order_modifications
+where coalesce(_fivetran_deleted,false) <> true
+and created_at::date >= (dateadd(day, -7, (dateadd(hour, 0, current_timestamp()::date)))))
+UNION ALL
+SELECT * FROM (select distinct id,'ar' as country_id,order_id,type,params,created_at,
+DATEADD(hour, -5,created_at) as created_at_co_order,storekeeper_id
+from ar_core_orders_public.order_modifications
+where coalesce(_fivetran_deleted,false) <> true
+and created_at::date >= (dateadd(day, -7, (dateadd(hour, 0, current_timestamp()::date)))))
+UNION ALL
+SELECT * FROM (select distinct id,'cl' as country_id,order_id,type,params,created_at,
+DATEADD(hour, -5,created_at) as created_at_co_order,storekeeper_id
+from cl_core_orders_public.order_modifications
+where coalesce(_fivetran_deleted,false) <> true
+and created_at::date >= (dateadd(day, -7, (dateadd(hour, 0, current_timestamp()::date)))))
+UNION ALL
+SELECT * FROM (select distinct id,'uy' as country_id,order_id,type,params,created_at,
+DATEADD(hour, -5,created_at) as created_at_co_order,storekeeper_id
+from uy_core_orders_public.order_modifications
+where coalesce(_fivetran_deleted,false) <> true
+and created_at::date >= (dateadd(day, -7, (dateadd(hour, 0, current_timestamp()::date)))))
+UNION ALL
+SELECT * FROM (select id,'pe' as country_id,order_id,type,params,created_at,
+DATEADD(hour, -5,created_at) as created_at_co_order,storekeeper_id
+from pe_core_orders_public.order_modifications
+where coalesce(_fivetran_deleted,false) <> true
+and created_at::date >= (dateadd(day, -7, (dateadd(hour, 0, current_timestamp()::date)))))
+UNION ALL
+SELECT * FROM (select distinct id,'cr' as country_id,order_id,type,params,created_at,
+DATEADD(hour, -5,created_at) as created_at_co_order,storekeeper_id
+from cr_core_orders_public.order_modifications
+where coalesce(_fivetran_deleted,false) <> true
+and created_at::date >= (dateadd(day, -7, (dateadd(hour, 0, current_timestamp()::date)))))
+UNION ALL
+SELECT *FROM (select distinct id,'ec' as country_id,order_id,type,params,created_at,
+DATEADD(hour, -5,created_at) as created_at_co_order,storekeeper_id
+from ec_core_orders_public.order_modifications
+where coalesce(_fivetran_deleted,false) <> true
+and created_at::date >= (dateadd(day, -7, (dateadd(hour, 0, current_timestamp()::date)))))
+UNION ALL
+SELECT * FROM (select distinct id,'br' as country_id,order_id,type,params,created_at,
+DATEADD(hour, -5,created_at) as created_at_co_order,storekeeper_id
+from br_core_orders_public.order_modifications
+where coalesce(_fivetran_deleted,false) <> true
+and created_at::date >= (dateadd(day, -7, (dateadd(hour, 0, current_timestamp()::date)))))
+
+) as vw_order_modifications
+where 
+  
+--trim(params:reason:key,'"')::text 
+  
+type  in (
+
+
+ 
+  'rt_with_products',
+'shopper_products_delivery_to_sk',
+'hand_to_domiciliary',
+'delivery_to_rappitendero',
+'arrive',
+'payless_transaction_authorized'
+  
+  
+)
+ -- and storekeeper_id::text is not null
+
+/* or 
+  
+  trim(params:reason:label,'"')::text in ('RT no tiene tarjeta para pagar'
+,'RT não tem cartão para pagar'
+,'RT doesn´t have a card to pay')
+*/
+),
+
+ tempcontrolreseasonroute as (
+ select distinct ORDER_ID::text as ORDER_ID,
+  ID::text AS ORDER_BAG_ID,
+COUNTRY_ID,
+  created_at,
+REGEXP_REPLACE(split_part(ORDER_BAG.CONTROL_REASONS_ROUTE, '&',  1),'[0-9]', '')  as tipousuario,
+REGEXP_REPLACE(split_part(ORDER_BAG.CONTROL_REASONS_ROUTE, '&',  2),'[0-9]', '')  as nivel1,
+REGEXP_REPLACE(split_part(ORDER_BAG.CONTROL_REASONS_ROUTE, '&',  3),'[0-9]', '')  as nivel2,
+REGEXP_REPLACE(split_part(ORDER_BAG.CONTROL_REASONS_ROUTE, '&',  4),'[0-9]', '')  as nivel3 ,   
+  
+REGEXP_REPLACE(CONTROL_REASONS_KEY,'[0-9]', '') as CONTROL_REASONS_KEY,
+REGEXP_REPLACE(CONTROL_REASONS_ROUTE,'[0-9]', '') as CONTROL_REASONS_ROUTE
+ from CO_PG_MS_SUPPORT_ASSIGNER_PUBLIC.ORDER_BAG 
+ where created_at::date >= (dateadd(day, -7, (dateadd(hour, 0, current_timestamp()::date)))) 
+   QUALIFY row_number() over(partition by ORDER_ID,COUNTRY_ID order by created_at desc) = 1
+  ),
+
+coreview as (
+
+  SELECT 'co' AS country_id, CREATED_AT,
+       id, 
+       application_user_id,
+       storekeeper_id,
+       DELIVERYBOY_ID,
+       ADDRESS_ID,
+       state,
+       place_at,
+       TOTAL_VALUE,
+       TIP,
+       ETA_STARTS_AT,
+       ETA
+FROM co_CORE_ORDERS_PUBLIC.ORDERS_VW ORDERS
+WHERE coalesce(ORDERS._fivetran_deleted,FALSE) <> TRUE
+and CREATED_AT::date >= (dateadd(day, -7, (dateadd(hour, 0, current_timestamp()::date))))
+union
+   SELECT 'mx' AS country_id, CREATED_AT,
+       id, 
+       application_user_id,
+       storekeeper_id,
+       DELIVERYBOY_ID,
+       ADDRESS_ID,
+       state,
+       place_at,
+       TOTAL_VALUE,
+       TIP,
+       ETA_STARTS_AT,
+       ETA
+FROM mx_CORE_ORDERS_PUBLIC.ORDERS_VW ORDERS
+WHERE coalesce(ORDERS._fivetran_deleted,FALSE) <> TRUE
+and CREATED_AT::date >= (dateadd(day, -7, (dateadd(hour, 0, current_timestamp()::date))))
+  union
+   SELECT 'cr' AS country_id, CREATED_AT,
+       id, 
+       application_user_id,
+       storekeeper_id,
+       DELIVERYBOY_ID,
+       ADDRESS_ID,
+       state,
+       place_at,
+       TOTAL_VALUE,
+       TIP,
+       ETA_STARTS_AT,
+       ETA
+FROM cr_CORE_ORDERS_PUBLIC.ORDERS_VW ORDERS
+WHERE coalesce(ORDERS._fivetran_deleted,FALSE) <> TRUE
+and CREATED_AT::date >= (dateadd(day, -7, (dateadd(hour, 0, current_timestamp()::date))))
+    union
+   SELECT 'cl' AS country_id, CREATED_AT,
+       id, 
+       application_user_id,
+       storekeeper_id,
+       DELIVERYBOY_ID,
+       ADDRESS_ID,
+       state,
+       place_at,
+       TOTAL_VALUE,
+       TIP,
+       ETA_STARTS_AT,
+       ETA
+FROM cl_CORE_ORDERS_PUBLIC.ORDERS_VW ORDERS
+WHERE coalesce(ORDERS._fivetran_deleted,FALSE) <> TRUE
+and CREATED_AT::date >= (dateadd(day, -7, (dateadd(hour, 0, current_timestamp()::date))))
+  union
+   SELECT 'uy' AS country_id, CREATED_AT,
+       id, 
+       application_user_id,
+       storekeeper_id,
+       DELIVERYBOY_ID,
+       ADDRESS_ID,
+       state,
+       place_at,
+       TOTAL_VALUE,
+       TIP,
+       ETA_STARTS_AT,
+       ETA
+FROM uy_CORE_ORDERS_PUBLIC.ORDERS_VW ORDERS
+WHERE coalesce(ORDERS._fivetran_deleted,FALSE) <> TRUE
+and CREATED_AT::date >= (dateadd(day, -7, (dateadd(hour, 0, current_timestamp()::date))))
+   union
+   SELECT 'pe' AS country_id, CREATED_AT,
+       id, 
+       application_user_id,
+       storekeeper_id,
+       DELIVERYBOY_ID,
+       ADDRESS_ID,
+       state,
+       place_at,
+       TOTAL_VALUE,
+       TIP,
+       ETA_STARTS_AT,
+       ETA
+FROM pe_CORE_ORDERS_PUBLIC.ORDERS_VW ORDERS
+WHERE coalesce(ORDERS._fivetran_deleted,FALSE) <> TRUE
+and CREATED_AT::date >= (dateadd(day, -7, (dateadd(hour, 0, current_timestamp()::date))))
+   union
+   SELECT 'ec' AS country_id, CREATED_AT,
+       id, 
+       application_user_id,
+       storekeeper_id,
+       DELIVERYBOY_ID,
+       ADDRESS_ID,
+       state,
+       place_at,
+       TOTAL_VALUE,
+       TIP,
+       ETA_STARTS_AT,
+       ETA
+FROM ec_CORE_ORDERS_PUBLIC.ORDERS_VW ORDERS
+WHERE coalesce(ORDERS._fivetran_deleted,FALSE) <> TRUE
+and CREATED_AT::date >= (dateadd(day, -7, (dateadd(hour, 0, current_timestamp()::date))))
+   union
+   SELECT 'uy' AS country_id, CREATED_AT,
+       id, 
+       application_user_id,
+       storekeeper_id,
+       DELIVERYBOY_ID,
+       ADDRESS_ID,
+       state,
+       place_at,
+       TOTAL_VALUE,
+       TIP,
+       ETA_STARTS_AT,
+       ETA
+FROM uy_CORE_ORDERS_PUBLIC.ORDERS_VW ORDERS
+WHERE coalesce(ORDERS._fivetran_deleted,FALSE) <> TRUE
+and CREATED_AT::date >= (dateadd(day, -7, (dateadd(hour, 0, current_timestamp()::date))))
+   union
+   SELECT 'br' AS country_id, CREATED_AT,
+       id, 
+       application_user_id,
+       storekeeper_id,
+       DELIVERYBOY_ID,
+       ADDRESS_ID,
+       state,
+       place_at,
+       TOTAL_VALUE,
+       TIP,
+       ETA_STARTS_AT,
+       ETA
+FROM br_CORE_ORDERS_PUBLIC.ORDERS_VW ORDERS
+WHERE coalesce(ORDERS._fivetran_deleted,FALSE) <> TRUE
+and CREATED_AT::date >= (dateadd(day, -7, (dateadd(hour, 0, current_timestamp()::date))))
+),
+
+storekeeper as (
+
+select ID,
+FIRST_NAME,
+LAST_NAME,
+GENDER,
+BIRTHDAY,
+IDENTIFICATION_TYPE,
+IDENTIFICATION,
+STATE,
+DELETED_AT,
+CREATED_AT,
+UPDATED_AT,
+ADDRESS,
+CITY,
+COUNTRY,
+PROFILE_PIC,
+TYPE,
+IS_ACTIVE,
+PAYMENT_TYPE,
+PAYMENT_IDENTIFICATION,
+PAYMENT_TELEPHONE,
+EXPEDITER_ID,
+CMS_ZONE_ID,
+IS_EXPERT,
+POS_TERMINAL,
+TRANSPORT_MEDIA_TYPE,
+HAS_DELIVERY_KIT,
+HAS_UBER,
+KNOW_HOW,
+IS_TRUSTED,
+STOREKEEPER_RANK_ID,
+CARD_NUMBER,
+CASHLESS,
+DELIVERY_KIT_IS_ACTIVE,
+TERMINAL_IS_ACTIVE,
+DELIVERY_KIT_SIZE,
+PAY_SCHEDULE_TYPE_ID,
+ORDER_LEVEL_ID,
+CITY_ADDRESS_ID,
+HAS_BILLING_AGREEMENT,
+REQUIRES_PROFILE_PIC,
+TRANSPORT_MEDIA_TYPE_IS_ACTIVE,
+_FIVETRAN_SYNCED,
+_FIVETRAN_DELETED,
+AUTO_ACCEPTANCE,
+DISPERSION_CARD_ACTIVE,
+'co' as country_id
+from 
+co_GRABILITY_PUBLIC.STOREKEEPERS_OFUSCATED
+where TRANSPORT_MEDIA_TYPE_IS_ACTIVE = TRUE
+
+  
+  union
+  
+  select ID,
+FIRST_NAME,
+LAST_NAME,
+GENDER,
+BIRTHDAY,
+IDENTIFICATION_TYPE,
+IDENTIFICATION,
+STATE,
+DELETED_AT,
+CREATED_AT,
+UPDATED_AT,
+ADDRESS,
+CITY,
+COUNTRY,
+PROFILE_PIC,
+TYPE,
+IS_ACTIVE,
+PAYMENT_TYPE,
+PAYMENT_IDENTIFICATION,
+PAYMENT_TELEPHONE,
+EXPEDITER_ID,
+CMS_ZONE_ID,
+IS_EXPERT,
+POS_TERMINAL,
+TRANSPORT_MEDIA_TYPE,
+HAS_DELIVERY_KIT,
+HAS_UBER,
+KNOW_HOW,
+IS_TRUSTED,
+STOREKEEPER_RANK_ID,
+CARD_NUMBER,
+CASHLESS,
+DELIVERY_KIT_IS_ACTIVE,
+TERMINAL_IS_ACTIVE,
+DELIVERY_KIT_SIZE,
+PAY_SCHEDULE_TYPE_ID,
+ORDER_LEVEL_ID,
+CITY_ADDRESS_ID,
+HAS_BILLING_AGREEMENT,
+REQUIRES_PROFILE_PIC,
+TRANSPORT_MEDIA_TYPE_IS_ACTIVE,
+_FIVETRAN_SYNCED,
+_FIVETRAN_DELETED,
+AUTO_ACCEPTANCE,
+DISPERSION_CARD_ACTIVE,
+'mx' as country_id
+from 
+mx_GRABILITY_PUBLIC.STOREKEEPERS_OFUSCATED
+where TRANSPORT_MEDIA_TYPE_IS_ACTIVE = TRUE
+  union
+  
+  select ID,
+FIRST_NAME,
+LAST_NAME,
+GENDER,
+BIRTHDAY,
+IDENTIFICATION_TYPE,
+IDENTIFICATION,
+STATE,
+DELETED_AT,
+CREATED_AT,
+UPDATED_AT,
+ADDRESS,
+CITY,
+COUNTRY,
+PROFILE_PIC,
+TYPE,
+IS_ACTIVE,
+PAYMENT_TYPE,
+PAYMENT_IDENTIFICATION,
+PAYMENT_TELEPHONE,
+EXPEDITER_ID,
+CMS_ZONE_ID,
+IS_EXPERT,
+POS_TERMINAL,
+TRANSPORT_MEDIA_TYPE,
+HAS_DELIVERY_KIT,
+HAS_UBER,
+KNOW_HOW,
+IS_TRUSTED,
+STOREKEEPER_RANK_ID,
+CARD_NUMBER,
+CASHLESS,
+DELIVERY_KIT_IS_ACTIVE,
+TERMINAL_IS_ACTIVE,
+DELIVERY_KIT_SIZE,
+PAY_SCHEDULE_TYPE_ID,
+ORDER_LEVEL_ID,
+CITY_ADDRESS_ID,
+HAS_BILLING_AGREEMENT,
+REQUIRES_PROFILE_PIC,
+TRANSPORT_MEDIA_TYPE_IS_ACTIVE,
+_FIVETRAN_SYNCED,
+_FIVETRAN_DELETED,
+AUTO_ACCEPTANCE,
+DISPERSION_CARD_ACTIVE,
+'pe' as country_id
+from 
+pe_GRABILITY_PUBLIC.STOREKEEPERS_OFUSCATED
+where TRANSPORT_MEDIA_TYPE_IS_ACTIVE = TRUE
+    union
+  
+  select ID,
+FIRST_NAME,
+LAST_NAME,
+GENDER,
+BIRTHDAY,
+IDENTIFICATION_TYPE,
+IDENTIFICATION,
+STATE,
+DELETED_AT,
+CREATED_AT,
+UPDATED_AT,
+ADDRESS,
+CITY,
+COUNTRY,
+PROFILE_PIC,
+TYPE,
+IS_ACTIVE,
+PAYMENT_TYPE,
+PAYMENT_IDENTIFICATION,
+PAYMENT_TELEPHONE,
+EXPEDITER_ID,
+CMS_ZONE_ID,
+IS_EXPERT,
+POS_TERMINAL,
+TRANSPORT_MEDIA_TYPE,
+HAS_DELIVERY_KIT,
+HAS_UBER,
+KNOW_HOW,
+IS_TRUSTED,
+STOREKEEPER_RANK_ID,
+CARD_NUMBER,
+CASHLESS,
+DELIVERY_KIT_IS_ACTIVE,
+TERMINAL_IS_ACTIVE,
+DELIVERY_KIT_SIZE,
+PAY_SCHEDULE_TYPE_ID,
+ORDER_LEVEL_ID,
+CITY_ADDRESS_ID,
+HAS_BILLING_AGREEMENT,
+REQUIRES_PROFILE_PIC,
+TRANSPORT_MEDIA_TYPE_IS_ACTIVE,
+_FIVETRAN_SYNCED,
+_FIVETRAN_DELETED,
+AUTO_ACCEPTANCE,
+DISPERSION_CARD_ACTIVE,
+'uy' as country_id
+from 
+uy_GRABILITY_PUBLIC.STOREKEEPERS_OFUSCATED
+where TRANSPORT_MEDIA_TYPE_IS_ACTIVE = TRUE
+  
+    union
+  
+  select ID,
+FIRST_NAME,
+LAST_NAME,
+GENDER,
+BIRTHDAY,
+IDENTIFICATION_TYPE,
+IDENTIFICATION,
+STATE,
+DELETED_AT,
+CREATED_AT,
+UPDATED_AT,
+ADDRESS,
+CITY,
+COUNTRY,
+PROFILE_PIC,
+TYPE,
+IS_ACTIVE,
+PAYMENT_TYPE,
+PAYMENT_IDENTIFICATION,
+PAYMENT_TELEPHONE,
+EXPEDITER_ID,
+CMS_ZONE_ID,
+IS_EXPERT,
+POS_TERMINAL,
+TRANSPORT_MEDIA_TYPE,
+HAS_DELIVERY_KIT,
+HAS_UBER,
+KNOW_HOW,
+IS_TRUSTED,
+STOREKEEPER_RANK_ID,
+CARD_NUMBER,
+CASHLESS,
+DELIVERY_KIT_IS_ACTIVE,
+TERMINAL_IS_ACTIVE,
+DELIVERY_KIT_SIZE,
+PAY_SCHEDULE_TYPE_ID,
+ORDER_LEVEL_ID,
+CITY_ADDRESS_ID,
+HAS_BILLING_AGREEMENT,
+REQUIRES_PROFILE_PIC,
+TRANSPORT_MEDIA_TYPE_IS_ACTIVE,
+_FIVETRAN_SYNCED,
+_FIVETRAN_DELETED,
+AUTO_ACCEPTANCE,
+DISPERSION_CARD_ACTIVE,
+'cr' as country_id
+from 
+cr_GRABILITY_PUBLIC.STOREKEEPERS_OFUSCATED
+where TRANSPORT_MEDIA_TYPE_IS_ACTIVE = TRUE
+    union
+  
+  select ID,
+FIRST_NAME,
+LAST_NAME,
+GENDER,
+BIRTHDAY,
+IDENTIFICATION_TYPE,
+IDENTIFICATION,
+STATE,
+DELETED_AT,
+CREATED_AT,
+UPDATED_AT,
+ADDRESS,
+CITY,
+COUNTRY,
+PROFILE_PIC,
+TYPE,
+IS_ACTIVE,
+PAYMENT_TYPE,
+PAYMENT_IDENTIFICATION,
+PAYMENT_TELEPHONE,
+EXPEDITER_ID,
+CMS_ZONE_ID,
+IS_EXPERT,
+POS_TERMINAL,
+TRANSPORT_MEDIA_TYPE,
+HAS_DELIVERY_KIT,
+HAS_UBER,
+KNOW_HOW,
+IS_TRUSTED,
+STOREKEEPER_RANK_ID,
+CARD_NUMBER,
+CASHLESS,
+DELIVERY_KIT_IS_ACTIVE,
+TERMINAL_IS_ACTIVE,
+DELIVERY_KIT_SIZE,
+PAY_SCHEDULE_TYPE_ID,
+ORDER_LEVEL_ID,
+CITY_ADDRESS_ID,
+HAS_BILLING_AGREEMENT,
+REQUIRES_PROFILE_PIC,
+TRANSPORT_MEDIA_TYPE_IS_ACTIVE,
+_FIVETRAN_SYNCED,
+_FIVETRAN_DELETED,
+AUTO_ACCEPTANCE,
+DISPERSION_CARD_ACTIVE,
+'br' as country_id
+from 
+br_GRABILITY_PUBLIC.STOREKEEPERS_OFUSCATED
+where TRANSPORT_MEDIA_TYPE_IS_ACTIVE = TRUE
+   union
+  
+  select ID,
+FIRST_NAME,
+LAST_NAME,
+GENDER,
+BIRTHDAY,
+IDENTIFICATION_TYPE,
+IDENTIFICATION,
+STATE,
+DELETED_AT,
+CREATED_AT,
+UPDATED_AT,
+ADDRESS,
+CITY,
+COUNTRY,
+PROFILE_PIC,
+TYPE,
+IS_ACTIVE,
+PAYMENT_TYPE,
+PAYMENT_IDENTIFICATION,
+PAYMENT_TELEPHONE,
+EXPEDITER_ID,
+CMS_ZONE_ID,
+IS_EXPERT,
+POS_TERMINAL,
+TRANSPORT_MEDIA_TYPE,
+HAS_DELIVERY_KIT,
+HAS_UBER,
+KNOW_HOW,
+IS_TRUSTED,
+STOREKEEPER_RANK_ID,
+CARD_NUMBER,
+CASHLESS,
+DELIVERY_KIT_IS_ACTIVE,
+TERMINAL_IS_ACTIVE,
+DELIVERY_KIT_SIZE,
+PAY_SCHEDULE_TYPE_ID,
+ORDER_LEVEL_ID,
+CITY_ADDRESS_ID,
+HAS_BILLING_AGREEMENT,
+REQUIRES_PROFILE_PIC,
+TRANSPORT_MEDIA_TYPE_IS_ACTIVE,
+_FIVETRAN_SYNCED,
+_FIVETRAN_DELETED,
+AUTO_ACCEPTANCE,
+DISPERSION_CARD_ACTIVE,
+'ar' as country_id
+from 
+ar_GRABILITY_PUBLIC.STOREKEEPERS_OFUSCATED
+where TRANSPORT_MEDIA_TYPE_IS_ACTIVE = TRUE 
+  
+  
+    union
+  
+  select ID,
+FIRST_NAME,
+LAST_NAME,
+GENDER,
+BIRTHDAY,
+IDENTIFICATION_TYPE,
+IDENTIFICATION,
+STATE,
+DELETED_AT,
+CREATED_AT,
+UPDATED_AT,
+ADDRESS,
+CITY,
+COUNTRY,
+PROFILE_PIC,
+TYPE,
+IS_ACTIVE,
+PAYMENT_TYPE,
+PAYMENT_IDENTIFICATION,
+PAYMENT_TELEPHONE,
+EXPEDITER_ID,
+CMS_ZONE_ID,
+IS_EXPERT,
+POS_TERMINAL,
+TRANSPORT_MEDIA_TYPE,
+HAS_DELIVERY_KIT,
+HAS_UBER,
+KNOW_HOW,
+IS_TRUSTED,
+STOREKEEPER_RANK_ID,
+CARD_NUMBER,
+CASHLESS,
+DELIVERY_KIT_IS_ACTIVE,
+TERMINAL_IS_ACTIVE,
+DELIVERY_KIT_SIZE,
+PAY_SCHEDULE_TYPE_ID,
+ORDER_LEVEL_ID,
+CITY_ADDRESS_ID,
+HAS_BILLING_AGREEMENT,
+REQUIRES_PROFILE_PIC,
+TRANSPORT_MEDIA_TYPE_IS_ACTIVE,
+_FIVETRAN_SYNCED,
+_FIVETRAN_DELETED,
+AUTO_ACCEPTANCE,
+DISPERSION_CARD_ACTIVE,
+'cl' as country_id
+from 
+cl_GRABILITY_PUBLIC.STOREKEEPERS_OFUSCATED
+where TRANSPORT_MEDIA_TYPE_IS_ACTIVE = TRUE
+    union
+  
+  select ID,
+FIRST_NAME,
+LAST_NAME,
+GENDER,
+BIRTHDAY,
+IDENTIFICATION_TYPE,
+IDENTIFICATION,
+STATE,
+DELETED_AT,
+CREATED_AT,
+UPDATED_AT,
+ADDRESS,
+CITY,
+COUNTRY,
+PROFILE_PIC,
+TYPE,
+IS_ACTIVE,
+PAYMENT_TYPE,
+PAYMENT_IDENTIFICATION,
+PAYMENT_TELEPHONE,
+EXPEDITER_ID,
+CMS_ZONE_ID,
+IS_EXPERT,
+POS_TERMINAL,
+TRANSPORT_MEDIA_TYPE,
+HAS_DELIVERY_KIT,
+HAS_UBER,
+KNOW_HOW,
+IS_TRUSTED,
+STOREKEEPER_RANK_ID,
+CARD_NUMBER,
+CASHLESS,
+DELIVERY_KIT_IS_ACTIVE,
+TERMINAL_IS_ACTIVE,
+DELIVERY_KIT_SIZE,
+PAY_SCHEDULE_TYPE_ID,
+ORDER_LEVEL_ID,
+CITY_ADDRESS_ID,
+HAS_BILLING_AGREEMENT,
+REQUIRES_PROFILE_PIC,
+TRANSPORT_MEDIA_TYPE_IS_ACTIVE,
+_FIVETRAN_SYNCED,
+_FIVETRAN_DELETED,
+AUTO_ACCEPTANCE,
+DISPERSION_CARD_ACTIVE,
+'ec' as country_id
+from 
+ec_GRABILITY_PUBLIC.STOREKEEPERS_OFUSCATED
+where TRANSPORT_MEDIA_TYPE_IS_ACTIVE = TRUE
+),
+
+/*levels AS (
+
+                               SELECT 
+           a.* , b.level_name
+           FROM         ( 
+                              SELECT 
+                              country , 
+                              period_start_at::date AS day, 
+                              storekeeper_id, 
+                              MODE(level_id) AS level_id,
+                              LEAD(day) OVER(PARTITION BY country, storekeeper_id ORDER BY day) AS lead_day,
+                              CASE WHEN lead_day IS NULL THEN CURRENT_DATE ELSE lead_day END AS lim_sup_date
+
+                              FROM
+
+                              (
+                               SELECT 
+                                     'CR' AS country,
+                                     period_start_at,
+                                     level_id,
+                                     storekeeper_id
+
+                              FROM cr_PG_MS_CNS_PERFORMANCE_MS_PUBLIC.STOREKEEPER_CURRENT_LEVEL_HIST 
+                              WHERE 1=1
+                               AND level_id != 0
+
+                              AND COALESCE(_fivetran_deleted, False) = False
+                               
+                               
+                              UNION
+                              
+                              SELECT 
+                                     'CR' AS country,
+                                     updated_at,
+                                     level_id,
+                                     storekeeper_id
+
+                              FROM cr_pg_ms_cns_performance_ms_public.storekeeper_level
+                              WHERE 1=1 
+                               
+                              AND COALESCE(_fivetran_deleted, False) = False
+                              QUALIFY ROW_NUMBER() OVER(PARTITION BY country, storekeeper_id ORDER BY updated_at DESC) = 1
+                             
+                              UNION
+
+                              SELECT 
+                                     'UY' AS country,
+                                     period_start_at,
+                                     level_id,
+                                     storekeeper_id
+
+                              FROM UY_PG_MS_CNS_PERFORMANCE_MS_PUBLIC.STOREKEEPER_CURRENT_LEVEL_HIST 
+                              WHERE 1=1
+                               AND level_id != 0
+
+                              AND COALESCE(_fivetran_deleted, False) = False
+                                
+                              UNION
+                              
+                              SELECT 
+                                     'UY' AS country,
+                                     updated_at,
+                                     level_id,
+                                     storekeeper_id
+
+                              FROM UY_pg_ms_cns_performance_ms_public.storekeeper_level
+                              WHERE 1=1
+                               
+                              AND COALESCE(_fivetran_deleted, False) = False
+                              QUALIFY ROW_NUMBER() OVER(PARTITION BY country, storekeeper_id ORDER BY updated_at DESC) = 1
+
+                               UNION
+
+                               SELECT 
+                                      'BR' AS country,
+                                      period_start_at,
+                                      level_id,
+                                      storekeeper_id
+
+                               FROM BR_PG_MS_CNS_PERFORMANCE_MS_PUBLIC.STOREKEEPER_CURRENT_LEVEL_HIST 
+                               WHERE 1=1
+                               AND level_id != 0
+
+                              AND COALESCE(_fivetran_deleted, False) = False
+                                
+                             UNION
+                              
+                              SELECT 
+                                     'BR' AS country,
+                                     updated_at,
+                                     level_id,
+                                     storekeeper_id
+
+                              FROM BR_pg_ms_cns_performance_ms_public.storekeeper_level
+                              WHERE 1=1
+                               
+                              AND COALESCE(_fivetran_deleted, False) = False
+                              QUALIFY ROW_NUMBER() OVER(PARTITION BY country, storekeeper_id ORDER BY updated_at DESC) = 1
+
+                              UNION
+
+                              SELECT 
+                                     'CO' AS country,
+                                     period_start_at,
+                                     level_id,
+                                     storekeeper_id
+
+                              FROM CO_PG_MS_CNS_PERFORMANCE_MS_PUBLIC.STOREKEEPER_CURRENT_LEVEL_HIST 
+                              WHERE 1=1
+                               AND level_id != 0
+
+                              AND COALESCE(_fivetran_deleted, False) = False
+                                
+                              UNION
+                              
+                              SELECT 
+                                     'CO' AS country,
+                                     updated_at,
+                                     level_id,
+                                     storekeeper_id
+
+                             FROM CO_pg_ms_cns_performance_ms_public.storekeeper_level
+                              WHERE 1=1
+                               
+                              AND COALESCE(_fivetran_deleted, False) = False
+                              QUALIFY ROW_NUMBER() OVER(PARTITION BY country, storekeeper_id ORDER BY updated_at DESC) = 1
+
+                              UNION
+
+                              SELECT 
+                                     'AR' AS country,
+                                     period_start_at,
+                                     level_id,
+                                     storekeeper_id
+
+                              FROM AR_PG_MS_CNS_PERFORMANCE_MS_PUBLIC.STOREKEEPER_CURRENT_LEVEL_HIST 
+                              WHERE 1=1
+                               AND level_id != 0
+
+                              AND COALESCE(_fivetran_deleted, False) = False
+                                
+                              UNION
+                              
+                              SELECT 
+                                     'AR' AS country,
+                                     updated_at,
+                                     level_id,
+                                     storekeeper_id
+
+                              FROM AR_pg_ms_cns_performance_ms_public.storekeeper_level
+                              WHERE 1=1
+                               
+                              AND COALESCE(_fivetran_deleted, False) = False
+                              QUALIFY ROW_NUMBER() OVER(PARTITION BY country, storekeeper_id ORDER BY updated_at DESC) = 1
+
+                              UNION
+
+
+                               SELECT 
+                                      'MX' AS country,
+                                      period_start_at,
+                                      level_id,
+                                      storekeeper_id
+
+                               FROM MX_PG_MS_CNS_PERFORMANCE_MS_PUBLIC.STOREKEEPER_CURRENT_LEVEL_HIST 
+                               WHERE 1=1
+                               AND level_id != 0
+
+                               AND COALESCE(_fivetran_deleted, False) = False
+                                
+                              UNION
+                              
+                              SELECT 
+                                     'MX' AS country,
+                                     updated_at,
+                                     level_id,
+                                     storekeeper_id
+
+                              FROM MX_pg_ms_cns_performance_ms_public.storekeeper_level
+                              WHERE 1=1
+                               
+                              AND COALESCE(_fivetran_deleted, False) = False
+                              QUALIFY ROW_NUMBER() OVER(PARTITION BY country, storekeeper_id ORDER BY updated_at DESC) = 1
+
+                              UNION
+
+                              SELECT 
+                                     'PE' AS country,
+                                     period_start_at,
+                                     level_id,
+                                     storekeeper_id
+
+                              FROM PE_PG_MS_CNS_PERFORMANCE_MS_PUBLIC.STOREKEEPER_CURRENT_LEVEL_HIST 
+                              WHERE 1=1
+                               AND level_id != 0
+
+                              AND COALESCE(_fivetran_deleted, False) = False
+                                
+                             UNION
+                              
+                              SELECT 
+                                     'PE' AS country,
+                                     updated_at,
+                                     level_id,
+                                     storekeeper_id
+
+                              FROM PE_pg_ms_cns_performance_ms_public.storekeeper_level
+                              WHERE 1=1
+                               
+                              AND COALESCE(_fivetran_deleted, False) = False
+                              QUALIFY ROW_NUMBER() OVER(PARTITION BY country, storekeeper_id ORDER BY updated_at DESC) = 1
+
+                              UNION
+
+                              SELECT 
+                                     'CL' AS country,
+                                     period_start_at,
+                                     level_id,
+                                     storekeeper_id
+
+                              FROM CL_PG_MS_CNS_PERFORMANCE_MS_PUBLIC.STOREKEEPER_CURRENT_LEVEL_HIST 
+                              WHERE 1=1
+                               AND level_id != 0
+
+                              AND COALESCE(_fivetran_deleted, False) = False
+                                
+                                                           UNION
+                              
+                              SELECT 
+                                     'CL' AS country,
+                                     updated_at,
+                                     level_id,
+                                     storekeeper_id
+
+                              FROM CL_pg_ms_cns_performance_ms_public.storekeeper_level
+                              WHERE 1=1
+                               
+                              AND COALESCE(_fivetran_deleted, False) = False
+                              QUALIFY ROW_NUMBER() OVER(PARTITION BY country, storekeeper_id ORDER BY updated_at DESC) = 1
+
+
+                              UNION
+
+                              SELECT 
+                                     'EC' AS country,
+                                     period_start_at,
+                                     level_id,
+                                     storekeeper_id
+
+                              FROM EC_PG_MS_CNS_PERFORMANCE_MS_PUBLIC.STOREKEEPER_CURRENT_LEVEL_HIST 
+                              WHERE 1=1
+                               AND level_id != 0
+                              AND COALESCE(_fivetran_deleted, False) = False
+                                
+                              UNION
+                              
+                              SELECT 
+                                     'EC' AS country,
+                                     updated_at,
+                                     level_id,
+                                     storekeeper_id
+
+                              FROM EC_pg_ms_cns_performance_ms_public.storekeeper_level
+                              WHERE 1=1
+                               
+                              AND COALESCE(_fivetran_deleted, False) = False
+                              QUALIFY ROW_NUMBER() OVER(PARTITION BY country, storekeeper_id ORDER BY updated_at DESC) = 1
+
+                              )
+
+                               GROUP BY 1,2,3
+                        ) a
+                            LEFT JOIN br_pg_ms_sk_score_history_public.level b 
+                            ON b.id = a.level_id
+                               )
+
+
+
+,*/
+
+             /* base AS (
+                       SELECT 
+                       
+                       o.country,
+                       o.city,
+                       DATE_TRUNC(week, o.created_at::date) AS week, 
+                        (CASE 
+                                WHEN o.country = 'CO' AND week >= '2021-07-26' THEN week
+                                WHEN o.country = 'BR' AND week >= '2021-07-26' THEN week
+                                WHEN o.country = 'AR' AND week >= '2021-07-26' THEN week
+                                WHEN o.country = 'MX' AND week >= '2021-07-26' THEN week
+                                WHEN o.country = 'CL' AND week >= '2021-07-26' THEN week
+                                WHEN o.country = 'CR' AND week >= '2021-07-12' THEN week
+                                WHEN o.country = 'EC' AND week >= '2021-06-28' THEN week
+                                WHEN o.country = 'PE' AND week >= '2021-07-12' THEN week
+                                WHEN o.country = 'UY' AND week >= '2021-06-28' THEN week END)::date AS weekk,
+                        o.storekeeper_id,
+                        CASE WHEN l.level_name IS NULL THEN 'rookie' ELSE l.level_name END AS level_name
+                       
+                       FROM ops_global.global_orders o 
+                       LEFT JOIN levels l 
+                        ON l.country = o.country 
+                        AND l.storekeeper_id = o.storekeeper_id 
+                        AND o.created_at::date BETWEEN l.day AND l.lim_sup_date
+                       WHERE 1=1
+                        AND o.order_state IN ('finished','pending_review')
+                        AND week IS NOT NULL
+                 QUALIFY ROW_NUMBER() OVER(PARTITION BY o.country, o.city, o.storekeeper_id, week ORDER BY week ASC) =1
+                        ORDER BY 1,5
+                       ),*/
+
+  GLOBAL_CANCELATION AS (
+  SELECT *
+  FROM (
+    
+    
+    WITH SUPPORT_CANCELATION_ar as (
+    SELECT DISTINCT order_id
+    FROM  
+      ar_PG_MS_SUPPORT_LOGGER_PUBLIC.ORDER_ACTIONS
+    WHERE action_id ILIKE '%cancel%' 
+      AND NOT owner IN ('unknown','lupe@rappi.com')
+      AND NOT owner ILIKE '%@client%'
+)
+SELECT
+    ORDERS.id,
+    CANCELATIONS.order_id order_cancelation_id,
+    CONVERT_TIMEZONE('UTC', ORDERS.created_at) created_at,
+    ORDERS.state,
+    'ar' country_id
+FROM
+    ar_CORE_ORDERS_PUBLIC.ORDERS_VW ORDERS 
+LEFT JOIN SUPPORT_CANCELATION_ar CANCELATIONS
+    ON TO_VARCHAR(ORDERS.id) = CANCELATIONS.order_id
+WHERE COALESCE(ORDERS._fivetran_deleted,FALSE) != TRUE
+  AND NOT ORDERS.state IN ( 
+      'canceled_by_fraud', 
+      'canceled_by_split_error', 
+      'canceled_for_payment_error'
+  )
+  AND ORDERS.state ILIKE '%canceled%'
+  and ORDERS.created_at::date >= (dateadd(day, -7, (dateadd(hour, 0, current_timestamp()::date))))
+  )
+    UNION ALL
+  SELECT *
+  FROM (WITH SUPPORT_CANCELATION_cl as (
+    SELECT DISTINCT order_id
+    FROM  
+      cl_PG_MS_SUPPORT_LOGGER_PUBLIC.ORDER_ACTIONS
+    WHERE action_id ILIKE '%cancel%' 
+      AND NOT owner IN ('unknown','lupe@rappi.com')
+      AND NOT owner ILIKE '%@client%'
+)
+SELECT
+    ORDERS.id,
+    CANCELATIONS.order_id order_cancelation_id,
+    CONVERT_TIMEZONE('UTC', ORDERS.created_at) created_at,
+    ORDERS.state,
+    'cl' country_id
+FROM
+    cl_CORE_ORDERS_PUBLIC.ORDERS_VW ORDERS 
+LEFT JOIN SUPPORT_CANCELATION_cl CANCELATIONS
+    ON TO_VARCHAR(ORDERS.id) = CANCELATIONS.order_id
+WHERE COALESCE(ORDERS._fivetran_deleted,FALSE) != TRUE
+  AND NOT ORDERS.state IN ( 
+      'canceled_by_fraud', 
+      'canceled_by_split_error', 
+      'canceled_for_payment_error'
+  )
+  AND ORDERS.state ILIKE '%canceled%'
+   and ORDERS.created_at::date >= (dateadd(day, -7, (dateadd(hour, 0, current_timestamp()::date))))     )
+    UNION ALL 
+  SELECT *
+  FROM (WITH SUPPORT_CANCELATION_co as (
+    SELECT DISTINCT order_id
+    FROM  
+      co_PG_MS_SUPPORT_LOGGER_PUBLIC.ORDER_ACTIONS
+    WHERE action_id ILIKE '%cancel%' 
+      AND NOT owner IN ('unknown','lupe@rappi.com')
+      AND NOT owner ILIKE '%@client%'
+)
+SELECT
+    ORDERS.id,
+    CANCELATIONS.order_id order_cancelation_id,
+    CONVERT_TIMEZONE('UTC', ORDERS.created_at) created_at,
+    ORDERS.state,
+    'co' country_id
+FROM
+    co_CORE_ORDERS_PUBLIC.ORDERS_VW ORDERS 
+LEFT JOIN SUPPORT_CANCELATION_co CANCELATIONS
+    ON TO_VARCHAR(ORDERS.id) = CANCELATIONS.order_id
+WHERE COALESCE(ORDERS._fivetran_deleted,FALSE) != TRUE
+  AND NOT ORDERS.state IN ( 
+      'canceled_by_fraud', 
+      'canceled_by_split_error', 
+      'canceled_for_payment_error'
+  )
+  AND ORDERS.state ILIKE '%canceled%'
+   and ORDERS.created_at::date >= (dateadd(day, -7, (dateadd(hour, 0, current_timestamp()::date))))     )
+    UNION ALL 
+  SELECT *
+  FROM (WITH SUPPORT_CANCELATION_cr as (
+    SELECT DISTINCT order_id
+    FROM  
+      cr_PG_MS_SUPPORT_LOGGER_PUBLIC.ORDER_ACTIONS
+    WHERE action_id ILIKE '%cancel%' 
+      AND NOT owner IN ('unknown','lupe@rappi.com')
+      AND NOT owner ILIKE '%@client%'
+)
+SELECT
+    ORDERS.id,
+    CANCELATIONS.order_id order_cancelation_id,
+    CONVERT_TIMEZONE('UTC', ORDERS.created_at) created_at,
+    ORDERS.state,
+    'cr' country_id
+FROM
+    cr_CORE_ORDERS_PUBLIC.ORDERS_VW ORDERS 
+LEFT JOIN SUPPORT_CANCELATION_cr CANCELATIONS
+    ON TO_VARCHAR(ORDERS.id) = CANCELATIONS.order_id
+WHERE COALESCE(ORDERS._fivetran_deleted,FALSE) != TRUE
+  AND NOT ORDERS.state IN ( 
+      'canceled_by_fraud', 
+      'canceled_by_split_error', 
+      'canceled_for_payment_error'
+  )
+  AND ORDERS.state ILIKE '%canceled%'
+   and ORDERS.created_at::date >= (dateadd(day, -7, (dateadd(hour, 0, current_timestamp()::date))))     
+       )
+    UNION ALL 
+  SELECT *
+  FROM (WITH SUPPORT_CANCELATION_ec as (
+    SELECT DISTINCT order_id
+    FROM  
+      ec_PG_MS_SUPPORT_LOGGER_PUBLIC.ORDER_ACTIONS
+    WHERE action_id ILIKE '%cancel%' 
+      AND NOT owner IN ('unknown','lupe@rappi.com')
+      AND NOT owner ILIKE '%@client%'
+)
+SELECT
+    ORDERS.id,
+    CANCELATIONS.order_id order_cancelation_id,
+    CONVERT_TIMEZONE('UTC', ORDERS.created_at) created_at,
+    ORDERS.state,
+    'ec' country_id
+FROM
+    ec_CORE_ORDERS_PUBLIC.ORDERS_VW ORDERS 
+LEFT JOIN SUPPORT_CANCELATION_ec CANCELATIONS
+    ON TO_VARCHAR(ORDERS.id) = CANCELATIONS.order_id
+WHERE COALESCE(ORDERS._fivetran_deleted,FALSE) != TRUE
+  AND NOT ORDERS.state IN ( 
+      'canceled_by_fraud', 
+      'canceled_by_split_error', 
+      'canceled_for_payment_error'
+  )
+  AND ORDERS.state ILIKE '%canceled%'
+    and ORDERS.created_at::date >= (dateadd(day, -7, (dateadd(hour, 0, current_timestamp()::date))))    )
+    UNION ALL 
+  SELECT *
+  FROM (WITH SUPPORT_CANCELATION_mx as (
+    SELECT DISTINCT order_id
+    FROM  
+      mx_PG_MS_SUPPORT_LOGGER_PUBLIC.ORDER_ACTIONS
+    WHERE action_id ILIKE '%cancel%' 
+      AND NOT owner IN ('unknown','lupe@rappi.com')
+      AND NOT owner ILIKE '%@client%'
+)
+SELECT
+    ORDERS.id,
+    CANCELATIONS.order_id order_cancelation_id,
+    CONVERT_TIMEZONE('UTC', ORDERS.created_at) created_at,
+    ORDERS.state,
+    'mx' country_id
+FROM
+    mx_CORE_ORDERS_PUBLIC.ORDERS_VW ORDERS 
+LEFT JOIN SUPPORT_CANCELATION_mx CANCELATIONS
+    ON TO_VARCHAR(ORDERS.id) = CANCELATIONS.order_id
+WHERE COALESCE(ORDERS._fivetran_deleted,FALSE) != TRUE
+  AND NOT ORDERS.state IN ( 
+      'canceled_by_fraud', 
+      'canceled_by_split_error', 
+      'canceled_for_payment_error'
+  )
+  AND ORDERS.state ILIKE '%canceled%'
+        and ORDERS.created_at::date >= (dateadd(day, -7, (dateadd(hour, 0, current_timestamp()::date)))))
+    UNION ALL 
+  SELECT *
+  FROM (WITH SUPPORT_CANCELATION_pe as (
+    SELECT DISTINCT order_id
+    FROM  
+      pe_PG_MS_SUPPORT_LOGGER_PUBLIC.ORDER_ACTIONS
+    WHERE action_id ILIKE '%cancel%' 
+      AND NOT owner IN ('unknown','lupe@rappi.com')
+      AND NOT owner ILIKE '%@client%'
+)
+SELECT
+    ORDERS.id,
+    CANCELATIONS.order_id order_cancelation_id,
+    CONVERT_TIMEZONE('UTC', ORDERS.created_at) created_at,
+    ORDERS.state,
+    'pe' country_id
+FROM
+    pe_CORE_ORDERS_PUBLIC.ORDERS_VW ORDERS 
+LEFT JOIN SUPPORT_CANCELATION_pe CANCELATIONS
+    ON TO_VARCHAR(ORDERS.id) = CANCELATIONS.order_id
+WHERE COALESCE(ORDERS._fivetran_deleted,FALSE) != TRUE
+  AND NOT ORDERS.state IN ( 
+      'canceled_by_fraud', 
+      'canceled_by_split_error', 
+      'canceled_for_payment_error'
+  )
+  AND ORDERS.state ILIKE '%canceled%'
+        and ORDERS.created_at::date >= (dateadd(day, -7, (dateadd(hour, 0, current_timestamp()::date)))))
+    UNION ALL 
+  SELECT *
+  FROM (WITH SUPPORT_CANCELATION_uy as (
+    SELECT DISTINCT order_id
+    FROM  
+      uy_PG_MS_SUPPORT_LOGGER_PUBLIC.ORDER_ACTIONS
+    WHERE action_id ILIKE '%cancel%' 
+      AND NOT owner IN ('unknown','lupe@rappi.com')
+      AND NOT owner ILIKE '%@client%'
+)
+SELECT
+    ORDERS.id,
+    CANCELATIONS.order_id order_cancelation_id,
+    CONVERT_TIMEZONE('UTC', ORDERS.created_at) created_at,
+    ORDERS.state,
+    'uy' country_id
+FROM
+    uy_CORE_ORDERS_PUBLIC.ORDERS_VW ORDERS 
+LEFT JOIN SUPPORT_CANCELATION_uy CANCELATIONS
+    ON TO_VARCHAR(ORDERS.id) = CANCELATIONS.order_id
+WHERE COALESCE(ORDERS._fivetran_deleted,FALSE) != TRUE
+  AND NOT ORDERS.state IN ( 
+      'canceled_by_fraud', 
+      'canceled_by_split_error', 
+      'canceled_for_payment_error'
+  )
+  AND ORDERS.state ILIKE '%canceled%'
+        and ORDERS.created_at::date >= (dateadd(day, -7, (dateadd(hour, 0, current_timestamp()::date)))))
+    UNION ALL 
+  SELECT *
+  FROM (WITH SUPPORT_CANCELATION_br as (
+    SELECT DISTINCT order_id
+    FROM  
+      br_PG_MS_SUPPORT_LOGGER_PUBLIC.ORDER_ACTIONS
+    WHERE action_id ILIKE '%cancel%' 
+      AND NOT owner IN ('unknown','lupe@rappi.com')
+      AND NOT owner ILIKE '%@client%'
+)
+SELECT
+    ORDERS.id,
+    CANCELATIONS.order_id order_cancelation_id,
+    CONVERT_TIMEZONE('UTC', ORDERS.created_at) created_at,
+    ORDERS.state,
+    'br' country_id
+FROM
+    br_CORE_ORDERS_PUBLIC.ORDERS_VW ORDERS 
+LEFT JOIN SUPPORT_CANCELATION_br CANCELATIONS
+    ON TO_VARCHAR(ORDERS.id) = CANCELATIONS.order_id
+WHERE COALESCE(ORDERS._fivetran_deleted,FALSE) != TRUE
+  AND NOT ORDERS.state IN ( 
+      'canceled_by_fraud', 
+      'canceled_by_split_error', 
+      'canceled_for_payment_error'
+  )
+  AND ORDERS.state ILIKE '%canceled%'
+        and ORDERS.created_at::date >= (dateadd(day, -7, (dateadd(hour, 0, current_timestamp()::date)))))
+) ,
+ VERTICALS AS (
+    SELECT DISTINCT store_type, "GROUP" as group_,
+    LAST_VALUE(sub_group) OVER (
+        PARTITION BY store_type ORDER BY _fivetran_synced
+    ) AS sub_group, 
+  'co' as country
+    FROM co_PGLR_MS_STORES_PUBLIC.VERTICALS --N/A
+    WHERE _fivetran_deleted=FALSE
+  union
+   SELECT DISTINCT store_type, "GROUP" as group_,
+    LAST_VALUE(sub_group) OVER (
+        PARTITION BY store_type ORDER BY _fivetran_synced
+    ) AS sub_group, 
+  'mx' as country
+    FROM mx_PGLR_MS_STORES_PUBLIC.VERTICALS --N/A
+    WHERE _fivetran_deleted=FALSE
+  union
+   SELECT DISTINCT store_type, "GROUP" as group_,
+    LAST_VALUE(sub_group) OVER (
+        PARTITION BY store_type ORDER BY _fivetran_synced
+    ) AS sub_group, 
+  'cl' as country
+    FROM cl_PGLR_MS_STORES_PUBLIC.VERTICALS --N/A
+    WHERE _fivetran_deleted=FALSE
+  union
+   SELECT DISTINCT store_type, "GROUP" as group_,
+    LAST_VALUE(sub_group) OVER (
+        PARTITION BY store_type ORDER BY _fivetran_synced
+    ) AS sub_group, 
+  'cr' as country
+    FROM cr_PGLR_MS_STORES_PUBLIC.VERTICALS --N/A
+    WHERE _fivetran_deleted=FALSE
+  union
+   SELECT DISTINCT store_type, "GROUP" as group_,
+    LAST_VALUE(sub_group) OVER (
+        PARTITION BY store_type ORDER BY _fivetran_synced
+    ) AS sub_group, 
+  'uy' as country
+    FROM uy_PGLR_MS_STORES_PUBLIC.VERTICALS --N/A
+    WHERE _fivetran_deleted=FALSE
+    union
+   SELECT DISTINCT store_type, "GROUP" as group_,
+    LAST_VALUE(sub_group) OVER (
+        PARTITION BY store_type ORDER BY _fivetran_synced
+    ) AS sub_group, 
+  'br' as country
+    FROM br_PGLR_MS_STORES_PUBLIC.VERTICALS --N/A
+    WHERE _fivetran_deleted=FALSE
+   union
+   SELECT DISTINCT store_type, "GROUP" as group_,
+    LAST_VALUE(sub_group) OVER (
+        PARTITION BY store_type ORDER BY _fivetran_synced
+    ) AS sub_group, 
+  'ar' as country
+    FROM ar_PGLR_MS_STORES_PUBLIC.VERTICALS --N/A
+    WHERE _fivetran_deleted=FALSE
+   union
+   SELECT DISTINCT store_type, "GROUP" as group_,
+    LAST_VALUE(sub_group) OVER (
+        PARTITION BY store_type ORDER BY _fivetran_synced
+    ) AS sub_group, 
+  'ec' as country
+    FROM ec_PGLR_MS_STORES_PUBLIC.VERTICALS --N/A
+    WHERE _fivetran_deleted=FALSE
+  union
+   SELECT DISTINCT store_type, "GROUP" as group_,
+    LAST_VALUE(sub_group) OVER (
+        PARTITION BY store_type ORDER BY _fivetran_synced
+    ) AS sub_group, 
+  'pe' as country
+    FROM pe_PGLR_MS_STORES_PUBLIC.VERTICALS --N/A
+    WHERE _fivetran_deleted=FALSE
+),
+  
+ order_calculated as ( 
+SELECT
+    CALCULATED_ORDERS.order_id, 
+    ORDERS.state,
+    ORDERS.payment_method,
+    ORDERS.total_value,
+    ORDERS.tip,
+    CALCULATED_ORDERS.shipping,
+    ORDERS.total_value::float/TRM_FIXED.trm AS total_value_usd,
+    TRM_FIXED.trm AS TRM,
+    ORDERS.created_at::timestamp as created_at,
+    ORDERS.place_at::timestamp as place_at,
+    ORDERS.closed_at::timestamp as closed_at,
+    ORDERS.taked_at::timestamp as taked_at,
+    CANCELLATIONS.canceled_at::timestamp as canceled_at,
+    CANCELLATIONS.cancel_time,
+    CALCULATED_ORDERS.last_update_state,
+    ORDERS.updated_at::timestamp as updated_at,
+    ORDERS.eta_starts_at::timestamp as eta_starts_at,
+    ORDERS.cooking_time_started_at::timestamp as cooking_time_started,
+    ORDERS.application_user_id,
+    --ORDERS.init_eta,
+    ORDERS.eta,
+    DATEDIFF('MINUTES', ORDERS.created_at, ORDERS.closed_at) AS eta_real,
+    ORDERS.cooking_time,
+    ORDERS.storekeeper_id,
+    ORDERS.coupon_code,
+    CALCULATED_ORDERS.store_id,
+    STORES.name AS store_name,
+    STORES.city_address_id,
+    CALCULATED_ORDERS.store_type,
+    VERTICALS.group_,
+    VERTICALS.sub_group,    
+    CASE
+      WHEN VERTICALS.sub_group in ('Super','Hiper') THEN 'Super/Hiper'
+      WHEN VERTICALS.sub_group in ('Tecnologia','Tecnology','technology',	'tecnologia',	'Tecnología',
+'Mascotas','Sex shop','sex shop','sex_shop','Maquillaje','Moda','Servicios','Ropa','Gamers','Flores','Floristería','flowers',
+'Hogar','Belleza','Marcas','marcas') THEN 'Ecommerce'
+      WHEN VERTICALS.sub_group in ('Rappicash','Rappifavor','Restaurantes','Farmacia','Express','express','Licores','Antojos','CPGs') THEN VERTICALS.sub_group
+      WHEN VERTICALS.sub_group is null THEN 'Sin vertical'
+      ELSE 'Otro'
+    END AS VERTICAL,
+    STORES.address,
+    CODES.input_code,
+    'co' AS country_id
+FROM co_CORE_ORDERS_CALCULATED_INFORMATION.ORDERS_VW as CALCULATED_ORDERS  --ok
+LEFT JOIN co_PGLR_MS_STORES_PUBLIC.stores_vw as STORES --ok 
+    ON CALCULATED_ORDERS.store_id::text =STORES.store_id::text
+    AND COALESCE(STORES._fivetran_deleted,false)=false
+LEFT JOIN VERTICALS 
+    ON VERTICALS.store_type::text = STORES.type::text and VERTICALS.country = 'co'
+--LEFT JOIN CO_CORE_ORDERS_PUBLIC.ORDER_STORES
+    --ON ORDER_STORES.order_id = CALCULATED_ORDERS.order_id
+INNER JOIN co_CORE_ORDERS_PUBLIC.ORDERS_VW as ORDERS  --ok
+    ON CALCULATED_ORDERS.ORDER_ID::text = ORDERS.ID::text
+LEFT JOIN co_PG_MS_ORDER_HANDSHAKE_PUBLIC.codes AS CODES
+    ON CODES.order_id::text = CALCULATED_ORDERS.ORDER_ID::text
+LEFT JOIN ops_global.cancellation_reasons CANCELLATIONS
+   ON CANCELLATIONS.order_id::text = CALCULATED_ORDERS.order_id::text
+   AND lower(CANCELLATIONS.country) = 'co'
+LEFT JOIN GLOBAL_FINANCES.TRM_FIXED  --/N/A
+  ON LOWER(TRM_FIXED.country_code::text) = 'co'
+WHERE COALESCE(CALCULATED_ORDERS._fivetran_deleted,FALSE)<>TRUE
+AND ORDERS.created_at::date >= (dateadd(day, -7, (dateadd(hour, 0, current_timestamp()::date))))
+union
+   SELECT
+    CALCULATED_ORDERS.order_id, 
+    ORDERS.state,
+    ORDERS.payment_method,
+    ORDERS.total_value,
+    ORDERS.tip,
+    CALCULATED_ORDERS.shipping,
+    ORDERS.total_value::float/TRM_FIXED.trm AS total_value_usd,
+    TRM_FIXED.trm AS TRM,
+    ORDERS.created_at::timestamp as created_at,
+    ORDERS.place_at::timestamp as place_at,
+    ORDERS.closed_at::timestamp as closed_at,
+    ORDERS.taked_at::timestamp as taked_at,
+    CANCELLATIONS.canceled_at::timestamp as canceled_at,
+    CANCELLATIONS.cancel_time,
+    CALCULATED_ORDERS.last_update_state,
+    ORDERS.updated_at::timestamp as updated_at,
+    ORDERS.eta_starts_at::timestamp as eta_starts_at,
+    ORDERS.cooking_time_started_at::timestamp as cooking_time_started,
+    ORDERS.application_user_id,
+    --ORDERS.init_eta,
+    ORDERS.eta,
+    DATEDIFF('MINUTES', ORDERS.created_at, ORDERS.closed_at) AS eta_real,
+    ORDERS.cooking_time,
+    ORDERS.storekeeper_id,
+    ORDERS.coupon_code,
+    CALCULATED_ORDERS.store_id,
+    STORES.name AS store_name,
+    STORES.city_address_id,
+    CALCULATED_ORDERS.store_type,
+    VERTICALS.group_,
+    VERTICALS.sub_group,    
+    CASE
+      WHEN VERTICALS.sub_group in ('Super','Hiper') THEN 'Super/Hiper'
+      WHEN VERTICALS.sub_group in ('Tecnologia','Tecnology','technology',	'tecnologia',	'Tecnología',
+'Mascotas','Sex shop','sex shop','sex_shop','Maquillaje','Moda','Servicios','Ropa','Gamers','Flores','Floristería','flowers',
+'Hogar','Belleza','Marcas','marcas') THEN 'Ecommerce'
+      WHEN VERTICALS.sub_group in ('Rappicash','Rappifavor','Restaurantes','Farmacia','Express','express','Licores','Antojos','CPGs') THEN VERTICALS.sub_group
+      WHEN VERTICALS.sub_group is null THEN 'Sin vertical'
+      ELSE 'Otro'
+    END AS VERTICAL,
+    STORES.address,
+    CODES.input_code,
+    'mx' AS country_id
+FROM mx_CORE_ORDERS_CALCULATED_INFORMATION.ORDERS_VW as CALCULATED_ORDERS  --ok
+LEFT JOIN mx_PGLR_MS_STORES_PUBLIC.stores_vw as STORES --ok 
+    ON CALCULATED_ORDERS.store_id::text =STORES.store_id::text
+    AND COALESCE(STORES._fivetran_deleted,false)=false
+LEFT JOIN VERTICALS 
+    ON VERTICALS.store_type::text = STORES.type::text and VERTICALS.country = 'mx'
+--LEFT JOIN CO_CORE_ORDERS_PUBLIC.ORDER_STORES
+    --ON ORDER_STORES.order_id = CALCULATED_ORDERS.order_id
+INNER JOIN mx_CORE_ORDERS_PUBLIC.ORDERS_VW as ORDERS  --ok
+    ON CALCULATED_ORDERS.ORDER_ID::text = ORDERS.ID::text
+LEFT JOIN mx_PG_MS_ORDER_HANDSHAKE_PUBLIC.codes AS CODES
+    ON CODES.order_id::text = CALCULATED_ORDERS.ORDER_ID::text
+LEFT JOIN ops_global.cancellation_reasons CANCELLATIONS
+   ON CANCELLATIONS.order_id::text = CALCULATED_ORDERS.order_id::text
+   AND lower(CANCELLATIONS.country) = 'mx'
+LEFT JOIN GLOBAL_FINANCES.TRM_FIXED  --/N/A
+  ON LOWER(TRM_FIXED.country_code::text) = 'mx'
+WHERE COALESCE(CALCULATED_ORDERS._fivetran_deleted,FALSE)<>TRUE
+AND ORDERS.created_at::date >= (dateadd(day, -7, (dateadd(hour, 0, current_timestamp()::date))))
+  union
+   SELECT
+    CALCULATED_ORDERS.order_id, 
+    ORDERS.state,
+    ORDERS.payment_method,
+    ORDERS.total_value,
+    ORDERS.tip,
+    CALCULATED_ORDERS.shipping,
+    ORDERS.total_value::float/TRM_FIXED.trm AS total_value_usd,
+    TRM_FIXED.trm AS TRM,
+    ORDERS.created_at::timestamp as created_at,
+    ORDERS.place_at::timestamp as place_at,
+    ORDERS.closed_at::timestamp as closed_at,
+    ORDERS.taked_at::timestamp as taked_at,
+    CANCELLATIONS.canceled_at::timestamp as canceled_at,
+    CANCELLATIONS.cancel_time,
+    CALCULATED_ORDERS.last_update_state,
+    ORDERS.updated_at::timestamp as updated_at,
+    ORDERS.eta_starts_at::timestamp as eta_starts_at,
+    ORDERS.cooking_time_started_at::timestamp as cooking_time_started,
+    ORDERS.application_user_id,
+    --ORDERS.init_eta,
+    ORDERS.eta,
+    DATEDIFF('MINUTES', ORDERS.created_at, ORDERS.closed_at) AS eta_real,
+    ORDERS.cooking_time,
+    ORDERS.storekeeper_id,
+    ORDERS.coupon_code,
+    CALCULATED_ORDERS.store_id,
+    STORES.name AS store_name,
+    STORES.city_address_id,
+    CALCULATED_ORDERS.store_type,
+    VERTICALS.group_,
+    VERTICALS.sub_group,    
+    CASE
+      WHEN VERTICALS.sub_group in ('Super','Hiper') THEN 'Super/Hiper'
+      WHEN VERTICALS.sub_group in ('Tecnologia','Tecnology','technology',	'tecnologia',	'Tecnología',
+'Mascotas','Sex shop','sex shop','sex_shop','Maquillaje','Moda','Servicios','Ropa','Gamers','Flores','Floristería','flowers',
+'Hogar','Belleza','Marcas','marcas') THEN 'Ecommerce'
+      WHEN VERTICALS.sub_group in ('Rappicash','Rappifavor','Restaurantes','Farmacia','Express','express','Licores','Antojos','CPGs') THEN VERTICALS.sub_group
+      WHEN VERTICALS.sub_group is null THEN 'Sin vertical'
+      ELSE 'Otro'
+    END AS VERTICAL,
+    STORES.address,
+    CODES.input_code,
+    'cl' AS country_id
+FROM cl_CORE_ORDERS_CALCULATED_INFORMATION.ORDERS_VW as CALCULATED_ORDERS  --ok
+LEFT JOIN cl_PGLR_MS_STORES_PUBLIC.stores_vw as STORES --ok 
+    ON CALCULATED_ORDERS.store_id::text =STORES.store_id::text
+    AND COALESCE(STORES._fivetran_deleted,false)=false
+LEFT JOIN VERTICALS 
+    ON VERTICALS.store_type::text = STORES.type::text and VERTICALS.country = 'cl'
+--LEFT JOIN CO_CORE_ORDERS_PUBLIC.ORDER_STORES
+    --ON ORDER_STORES.order_id = CALCULATED_ORDERS.order_id
+INNER JOIN cl_CORE_ORDERS_PUBLIC.ORDERS_VW as ORDERS  --ok
+    ON CALCULATED_ORDERS.ORDER_ID::text = ORDERS.ID::text
+LEFT JOIN cl_PG_MS_ORDER_HANDSHAKE_PUBLIC.codes AS CODES
+    ON CODES.order_id::text = CALCULATED_ORDERS.ORDER_ID::text
+LEFT JOIN ops_global.cancellation_reasons CANCELLATIONS
+   ON CANCELLATIONS.order_id::text = CALCULATED_ORDERS.order_id::text
+   AND lower(CANCELLATIONS.country) = 'cl'
+LEFT JOIN GLOBAL_FINANCES.TRM_FIXED  --/N/A
+  ON LOWER(TRM_FIXED.country_code::text) = 'cl'
+WHERE COALESCE(CALCULATED_ORDERS._fivetran_deleted,FALSE)<>TRUE
+AND ORDERS.created_at::date >= (dateadd(day, -7, (dateadd(hour, 0, current_timestamp()::date))))
+   union
+   SELECT
+    CALCULATED_ORDERS.order_id, 
+    ORDERS.state,
+    ORDERS.payment_method,
+    ORDERS.total_value,
+    ORDERS.tip,
+    CALCULATED_ORDERS.shipping,
+    ORDERS.total_value::float/TRM_FIXED.trm AS total_value_usd,
+    TRM_FIXED.trm AS TRM,
+    ORDERS.created_at::timestamp as created_at,
+    ORDERS.place_at::timestamp as place_at,
+    ORDERS.closed_at::timestamp as closed_at,
+    ORDERS.taked_at::timestamp as taked_at,
+    CANCELLATIONS.canceled_at::timestamp as canceled_at,
+    CANCELLATIONS.cancel_time,
+    CALCULATED_ORDERS.last_update_state,
+    ORDERS.updated_at::timestamp as updated_at,
+    ORDERS.eta_starts_at::timestamp as eta_starts_at,
+    ORDERS.cooking_time_started_at::timestamp as cooking_time_started,
+    ORDERS.application_user_id,
+    --ORDERS.init_eta,
+    ORDERS.eta,
+    DATEDIFF('MINUTES', ORDERS.created_at, ORDERS.closed_at) AS eta_real,
+    ORDERS.cooking_time,
+    ORDERS.storekeeper_id,
+    ORDERS.coupon_code,
+    CALCULATED_ORDERS.store_id,
+    STORES.name AS store_name,
+    STORES.city_address_id,
+    CALCULATED_ORDERS.store_type,
+    VERTICALS.group_,
+    VERTICALS.sub_group,    
+    CASE
+      WHEN VERTICALS.sub_group in ('Super','Hiper') THEN 'Super/Hiper'
+      WHEN VERTICALS.sub_group in ('Tecnologia','Tecnology','technology',	'tecnologia',	'Tecnología',
+'Mascotas','Sex shop','sex shop','sex_shop','Maquillaje','Moda','Servicios','Ropa','Gamers','Flores','Floristería','flowers',
+'Hogar','Belleza','Marcas','marcas') THEN 'Ecommerce'
+      WHEN VERTICALS.sub_group in ('Rappicash','Rappifavor','Restaurantes','Farmacia','Express','express','Licores','Antojos','CPGs') THEN VERTICALS.sub_group
+      WHEN VERTICALS.sub_group is null THEN 'Sin vertical'
+      ELSE 'Otro'
+    END AS VERTICAL,
+    STORES.address,
+    CODES.input_code,
+    'cr' AS country_id
+FROM cr_CORE_ORDERS_CALCULATED_INFORMATION.ORDERS_VW as CALCULATED_ORDERS  --ok
+LEFT JOIN cr_PGLR_MS_STORES_PUBLIC.stores_vw as STORES --ok 
+    ON CALCULATED_ORDERS.store_id::text =STORES.store_id::text
+    AND COALESCE(STORES._fivetran_deleted,false)=false
+LEFT JOIN VERTICALS 
+    ON VERTICALS.store_type::text = STORES.type::text and VERTICALS.country = 'cr'
+--LEFT JOIN CO_CORE_ORDERS_PUBLIC.ORDER_STORES
+    --ON ORDER_STORES.order_id = CALCULATED_ORDERS.order_id
+INNER JOIN cr_CORE_ORDERS_PUBLIC.ORDERS_VW as ORDERS  --ok
+    ON CALCULATED_ORDERS.ORDER_ID::text = ORDERS.ID::text
+LEFT JOIN cr_PG_MS_ORDER_HANDSHAKE_PUBLIC.codes AS CODES
+    ON CODES.order_id::text = CALCULATED_ORDERS.ORDER_ID::text
+LEFT JOIN ops_global.cancellation_reasons CANCELLATIONS
+   ON CANCELLATIONS.order_id::text = CALCULATED_ORDERS.order_id::text
+   AND lower(CANCELLATIONS.country) = 'cr'
+LEFT JOIN GLOBAL_FINANCES.TRM_FIXED  --/N/A
+  ON LOWER(TRM_FIXED.country_code::text) = 'cr'
+WHERE COALESCE(CALCULATED_ORDERS._fivetran_deleted,FALSE)<>TRUE
+AND ORDERS.created_at::date >= (dateadd(day, -7, (dateadd(hour, 0, current_timestamp()::date))))
+    union
+   SELECT
+    CALCULATED_ORDERS.order_id, 
+    ORDERS.state,
+    ORDERS.payment_method,
+    ORDERS.total_value,
+    ORDERS.tip,
+    CALCULATED_ORDERS.shipping,
+    ORDERS.total_value::float/TRM_FIXED.trm AS total_value_usd,
+    TRM_FIXED.trm AS TRM,
+    ORDERS.created_at::timestamp as created_at,
+    ORDERS.place_at::timestamp as place_at,
+    ORDERS.closed_at::timestamp as closed_at,
+    ORDERS.taked_at::timestamp as taked_at,
+    CANCELLATIONS.canceled_at::timestamp as canceled_at,
+    CANCELLATIONS.cancel_time,
+    CALCULATED_ORDERS.last_update_state,
+    ORDERS.updated_at::timestamp as updated_at,
+    ORDERS.eta_starts_at::timestamp as eta_starts_at,
+    ORDERS.cooking_time_started_at::timestamp as cooking_time_started,
+    ORDERS.application_user_id,
+    --ORDERS.init_eta,
+    ORDERS.eta,
+    DATEDIFF('MINUTES', ORDERS.created_at, ORDERS.closed_at) AS eta_real,
+    ORDERS.cooking_time,
+    ORDERS.storekeeper_id,
+    ORDERS.coupon_code,
+    CALCULATED_ORDERS.store_id,
+    STORES.name AS store_name,
+    STORES.city_address_id,
+    CALCULATED_ORDERS.store_type,
+    VERTICALS.group_,
+    VERTICALS.sub_group,    
+    CASE
+      WHEN VERTICALS.sub_group in ('Super','Hiper') THEN 'Super/Hiper'
+      WHEN VERTICALS.sub_group in ('Tecnologia','Tecnology','technology',	'tecnologia',	'Tecnología',
+'Mascotas','Sex shop','sex shop','sex_shop','Maquillaje','Moda','Servicios','Ropa','Gamers','Flores','Floristería','flowers',
+'Hogar','Belleza','Marcas','marcas') THEN 'Ecommerce'
+      WHEN VERTICALS.sub_group in ('Rappicash','Rappifavor','Restaurantes','Farmacia','Express','express','Licores','Antojos','CPGs') THEN VERTICALS.sub_group
+      WHEN VERTICALS.sub_group is null THEN 'Sin vertical'
+      ELSE 'Otro'
+    END AS VERTICAL,
+    STORES.address,
+    CODES.input_code,
+    'ar' AS country_id
+FROM ar_CORE_ORDERS_CALCULATED_INFORMATION.ORDERS_VW as CALCULATED_ORDERS  --ok
+LEFT JOIN ar_PGLR_MS_STORES_PUBLIC.stores_vw as STORES --ok 
+    ON CALCULATED_ORDERS.store_id::text =STORES.store_id::text
+    AND COALESCE(STORES._fivetran_deleted,false)=false
+LEFT JOIN VERTICALS 
+    ON VERTICALS.store_type::text = STORES.type::text and VERTICALS.country = 'ar'
+--LEFT JOIN CO_CORE_ORDERS_PUBLIC.ORDER_STORES
+    --ON ORDER_STORES.order_id = CALCULATED_ORDERS.order_id
+INNER JOIN ar_CORE_ORDERS_PUBLIC.ORDERS_VW as ORDERS  --ok
+    ON CALCULATED_ORDERS.ORDER_ID::text = ORDERS.ID::text
+LEFT JOIN ar_PG_MS_ORDER_HANDSHAKE_PUBLIC.codes AS CODES
+    ON CODES.order_id::text = CALCULATED_ORDERS.ORDER_ID::text
+LEFT JOIN ops_global.cancellation_reasons CANCELLATIONS
+   ON CANCELLATIONS.order_id::text = CALCULATED_ORDERS.order_id::text
+   AND lower(CANCELLATIONS.country) = 'ar'
+LEFT JOIN GLOBAL_FINANCES.TRM_FIXED  --/N/A
+  ON LOWER(TRM_FIXED.country_code::text) = 'ar'
+WHERE COALESCE(CALCULATED_ORDERS._fivetran_deleted,FALSE)<>TRUE
+AND ORDERS.created_at::date >= (dateadd(day, -7, (dateadd(hour, 0, current_timestamp()::date))))
+   
+    union
+   SELECT
+    CALCULATED_ORDERS.order_id, 
+    ORDERS.state,
+    ORDERS.payment_method,
+    ORDERS.total_value,
+    ORDERS.tip,
+    CALCULATED_ORDERS.shipping,
+    ORDERS.total_value::float/TRM_FIXED.trm AS total_value_usd,
+    TRM_FIXED.trm AS TRM,
+    ORDERS.created_at::timestamp as created_at,
+    ORDERS.place_at::timestamp as place_at,
+    ORDERS.closed_at::timestamp as closed_at,
+    ORDERS.taked_at::timestamp as taked_at,
+    CANCELLATIONS.canceled_at::timestamp as canceled_at,
+    CANCELLATIONS.cancel_time,
+    CALCULATED_ORDERS.last_update_state,
+    ORDERS.updated_at::timestamp as updated_at,
+    ORDERS.eta_starts_at::timestamp as eta_starts_at,
+    ORDERS.cooking_time_started_at::timestamp as cooking_time_started,
+    ORDERS.application_user_id,
+    --ORDERS.init_eta,
+    ORDERS.eta,
+    DATEDIFF('MINUTES', ORDERS.created_at, ORDERS.closed_at) AS eta_real,
+    ORDERS.cooking_time,
+    ORDERS.storekeeper_id,
+    ORDERS.coupon_code,
+    CALCULATED_ORDERS.store_id,
+    STORES.name AS store_name,
+    STORES.city_address_id,
+    CALCULATED_ORDERS.store_type,
+    VERTICALS.group_,
+    VERTICALS.sub_group,    
+    CASE
+      WHEN VERTICALS.sub_group in ('Super','Hiper') THEN 'Super/Hiper'
+      WHEN VERTICALS.sub_group in ('Tecnologia','Tecnology','technology',	'tecnologia',	'Tecnología',
+'Mascotas','Sex shop','sex shop','sex_shop','Maquillaje','Moda','Servicios','Ropa','Gamers','Flores','Floristería','flowers',
+'Hogar','Belleza','Marcas','marcas') THEN 'Ecommerce'
+      WHEN VERTICALS.sub_group in ('Rappicash','Rappifavor','Restaurantes','Farmacia','Express','express','Licores','Antojos','CPGs') THEN VERTICALS.sub_group
+      WHEN VERTICALS.sub_group is null THEN 'Sin vertical'
+      ELSE 'Otro'
+    END AS VERTICAL,
+    STORES.address,
+    CODES.input_code,
+    'pe' AS country_id
+FROM pe_CORE_ORDERS_CALCULATED_INFORMATION.ORDERS_VW as CALCULATED_ORDERS  --ok
+LEFT JOIN pe_PGLR_MS_STORES_PUBLIC.stores_vw as STORES --ok 
+    ON CALCULATED_ORDERS.store_id::text =STORES.store_id::text
+    AND COALESCE(STORES._fivetran_deleted,false)=false
+LEFT JOIN VERTICALS 
+    ON VERTICALS.store_type::text = STORES.type::text and VERTICALS.country = 'pe'
+--LEFT JOIN CO_CORE_ORDERS_PUBLIC.ORDER_STORES
+    --ON ORDER_STORES.order_id = CALCULATED_ORDERS.order_id
+INNER JOIN pe_CORE_ORDERS_PUBLIC.ORDERS_VW as ORDERS  --ok
+    ON CALCULATED_ORDERS.ORDER_ID::text = ORDERS.ID::text
+LEFT JOIN pe_PG_MS_ORDER_HANDSHAKE_PUBLIC.codes AS CODES
+    ON CODES.order_id::text = CALCULATED_ORDERS.ORDER_ID::text
+LEFT JOIN ops_global.cancellation_reasons CANCELLATIONS
+   ON CANCELLATIONS.order_id::text = CALCULATED_ORDERS.order_id::text
+   AND lower(CANCELLATIONS.country) = 'pe'
+LEFT JOIN GLOBAL_FINANCES.TRM_FIXED  --/N/A
+  ON LOWER(TRM_FIXED.country_code::text) = 'pe'
+WHERE COALESCE(CALCULATED_ORDERS._fivetran_deleted,FALSE)<>TRUE
+AND ORDERS.created_at::date >= (dateadd(day, -7, (dateadd(hour, 0, current_timestamp()::date))))
+    union
+   SELECT
+    CALCULATED_ORDERS.order_id, 
+    ORDERS.state,
+    ORDERS.payment_method,
+    ORDERS.total_value,
+    ORDERS.tip,
+    CALCULATED_ORDERS.shipping,
+    ORDERS.total_value::float/TRM_FIXED.trm AS total_value_usd,
+    TRM_FIXED.trm AS TRM,
+    ORDERS.created_at::timestamp as created_at,
+    ORDERS.place_at::timestamp as place_at,
+    ORDERS.closed_at::timestamp as closed_at,
+    ORDERS.taked_at::timestamp as taked_at,
+    CANCELLATIONS.canceled_at::timestamp as canceled_at,
+    CANCELLATIONS.cancel_time,
+    CALCULATED_ORDERS.last_update_state,
+    ORDERS.updated_at::timestamp as updated_at,
+    ORDERS.eta_starts_at::timestamp as eta_starts_at,
+    ORDERS.cooking_time_started_at::timestamp as cooking_time_started,
+    ORDERS.application_user_id,
+    --ORDERS.init_eta,
+    ORDERS.eta,
+    DATEDIFF('MINUTES', ORDERS.created_at, ORDERS.closed_at) AS eta_real,
+    ORDERS.cooking_time,
+    ORDERS.storekeeper_id,
+    ORDERS.coupon_code,
+    CALCULATED_ORDERS.store_id,
+    STORES.name AS store_name,
+    STORES.city_address_id,
+    CALCULATED_ORDERS.store_type,
+    VERTICALS.group_,
+    VERTICALS.sub_group,    
+    CASE
+      WHEN VERTICALS.sub_group in ('Super','Hiper') THEN 'Super/Hiper'
+      WHEN VERTICALS.sub_group in ('Tecnologia','Tecnology','technology',	'tecnologia',	'Tecnología',
+'Mascotas','Sex shop','sex shop','sex_shop','Maquillaje','Moda','Servicios','Ropa','Gamers','Flores','Floristería','flowers',
+'Hogar','Belleza','Marcas','marcas') THEN 'Ecommerce'
+      WHEN VERTICALS.sub_group in ('Rappicash','Rappifavor','Restaurantes','Farmacia','Express','express','Licores','Antojos','CPGs') THEN VERTICALS.sub_group
+      WHEN VERTICALS.sub_group is null THEN 'Sin vertical'
+      ELSE 'Otro'
+    END AS VERTICAL,
+    STORES.address,
+    CODES.input_code,
+    'ec' AS country_id
+FROM ec_CORE_ORDERS_CALCULATED_INFORMATION.ORDERS_VW as CALCULATED_ORDERS  --ok
+LEFT JOIN ec_PGLR_MS_STORES_PUBLIC.stores_vw as STORES --ok 
+    ON CALCULATED_ORDERS.store_id::text =STORES.store_id::text
+    AND COALESCE(STORES._fivetran_deleted,false)=false
+LEFT JOIN VERTICALS 
+    ON VERTICALS.store_type::text = STORES.type::text and VERTICALS.country = 'ec'
+--LEFT JOIN CO_CORE_ORDERS_PUBLIC.ORDER_STORES
+    --ON ORDER_STORES.order_id = CALCULATED_ORDERS.order_id
+INNER JOIN ec_CORE_ORDERS_PUBLIC.ORDERS_VW as ORDERS  --ok
+    ON CALCULATED_ORDERS.ORDER_ID::text = ORDERS.ID::text
+LEFT JOIN ec_PG_MS_ORDER_HANDSHAKE_PUBLIC.codes AS CODES
+    ON CODES.order_id::text = CALCULATED_ORDERS.ORDER_ID::text
+LEFT JOIN ops_global.cancellation_reasons CANCELLATIONS
+   ON CANCELLATIONS.order_id::text = CALCULATED_ORDERS.order_id::text
+   AND lower(CANCELLATIONS.country) = 'ec'
+LEFT JOIN GLOBAL_FINANCES.TRM_FIXED  --/N/A
+  ON LOWER(TRM_FIXED.country_code::text) = 'ec'
+WHERE COALESCE(CALCULATED_ORDERS._fivetran_deleted,FALSE)<>TRUE
+AND ORDERS.created_at::date >= (dateadd(day, -7, (dateadd(hour, 0, current_timestamp()::date))))
+    union
+   SELECT
+    CALCULATED_ORDERS.order_id, 
+    ORDERS.state,
+    ORDERS.payment_method,
+    ORDERS.total_value,
+    ORDERS.tip,
+    CALCULATED_ORDERS.shipping,
+    ORDERS.total_value::float/TRM_FIXED.trm AS total_value_usd,
+    TRM_FIXED.trm AS TRM,
+    ORDERS.created_at::timestamp as created_at,
+    ORDERS.place_at::timestamp as place_at,
+    ORDERS.closed_at::timestamp as closed_at,
+    ORDERS.taked_at::timestamp as taked_at,
+    CANCELLATIONS.canceled_at::timestamp as canceled_at,
+    CANCELLATIONS.cancel_time,
+    CALCULATED_ORDERS.last_update_state,
+    ORDERS.updated_at::timestamp as updated_at,
+    ORDERS.eta_starts_at::timestamp as eta_starts_at,
+    ORDERS.cooking_time_started_at::timestamp as cooking_time_started,
+    ORDERS.application_user_id,
+    --ORDERS.init_eta,
+    ORDERS.eta,
+    DATEDIFF('MINUTES', ORDERS.created_at, ORDERS.closed_at) AS eta_real,
+    ORDERS.cooking_time,
+    ORDERS.storekeeper_id,
+    ORDERS.coupon_code,
+    CALCULATED_ORDERS.store_id,
+    STORES.name AS store_name,
+    STORES.city_address_id,
+    CALCULATED_ORDERS.store_type,
+    VERTICALS.group_,
+    VERTICALS.sub_group,    
+    CASE
+      WHEN VERTICALS.sub_group in ('Super','Hiper') THEN 'Super/Hiper'
+      WHEN VERTICALS.sub_group in ('Tecnologia','Tecnology','technology',	'tecnologia',	'Tecnología',
+'Mascotas','Sex shop','sex shop','sex_shop','Maquillaje','Moda','Servicios','Ropa','Gamers','Flores','Floristería','flowers',
+'Hogar','Belleza','Marcas','marcas') THEN 'Ecommerce'
+      WHEN VERTICALS.sub_group in ('Rappicash','Rappifavor','Restaurantes','Farmacia','Express','express','Licores','Antojos','CPGs') THEN VERTICALS.sub_group
+      WHEN VERTICALS.sub_group is null THEN 'Sin vertical'
+      ELSE 'Otro'
+    END AS VERTICAL,
+    STORES.address,
+    CODES.input_code,
+    'br' AS country_id
+FROM br_CORE_ORDERS_CALCULATED_INFORMATION.ORDERS_VW as CALCULATED_ORDERS  --ok
+LEFT JOIN cr_PGLR_MS_STORES_PUBLIC.stores_vw as STORES --ok 
+    ON CALCULATED_ORDERS.store_id::text =STORES.store_id::text
+    AND COALESCE(STORES._fivetran_deleted,false)=false
+LEFT JOIN VERTICALS 
+    ON VERTICALS.store_type::text = STORES.type::text and VERTICALS.country = 'br'
+--LEFT JOIN CO_CORE_ORDERS_PUBLIC.ORDER_STORES
+    --ON ORDER_STORES.order_id = CALCULATED_ORDERS.order_id
+INNER JOIN br_CORE_ORDERS_PUBLIC.ORDERS_VW as ORDERS  --ok
+    ON CALCULATED_ORDERS.ORDER_ID::text = ORDERS.ID::text
+LEFT JOIN br_PG_MS_ORDER_HANDSHAKE_PUBLIC.codes AS CODES
+    ON CODES.order_id::text = CALCULATED_ORDERS.ORDER_ID::text
+LEFT JOIN ops_global.cancellation_reasons CANCELLATIONS
+   ON CANCELLATIONS.order_id::text = CALCULATED_ORDERS.order_id::text
+   AND lower(CANCELLATIONS.country) = 'br'
+LEFT JOIN GLOBAL_FINANCES.TRM_FIXED  --/N/A
+  ON LOWER(TRM_FIXED.country_code::text) = 'br'
+WHERE COALESCE(CALCULATED_ORDERS._fivetran_deleted,FALSE)<>TRUE
+AND ORDERS.created_at::date >= (dateadd(day, -7, (dateadd(hour, 0, current_timestamp()::date))))
+      union
+   SELECT
+    CALCULATED_ORDERS.order_id, 
+    ORDERS.state,
+    ORDERS.payment_method,
+    ORDERS.total_value,
+    ORDERS.tip,
+    CALCULATED_ORDERS.shipping,
+    ORDERS.total_value::float/TRM_FIXED.trm AS total_value_usd,
+    TRM_FIXED.trm AS TRM,
+    ORDERS.created_at::timestamp as created_at,
+    ORDERS.place_at::timestamp as place_at,
+    ORDERS.closed_at::timestamp as closed_at,
+    ORDERS.taked_at::timestamp as taked_at,
+    CANCELLATIONS.canceled_at::timestamp as canceled_at,
+    CANCELLATIONS.cancel_time,
+    CALCULATED_ORDERS.last_update_state,
+    ORDERS.updated_at::timestamp as updated_at,
+    ORDERS.eta_starts_at::timestamp as eta_starts_at,
+    ORDERS.cooking_time_started_at::timestamp as cooking_time_started,
+    ORDERS.application_user_id,
+    --ORDERS.init_eta,
+    ORDERS.eta,
+    DATEDIFF('MINUTES', ORDERS.created_at, ORDERS.closed_at) AS eta_real,
+    ORDERS.cooking_time,
+    ORDERS.storekeeper_id,
+    ORDERS.coupon_code,
+    CALCULATED_ORDERS.store_id,
+    STORES.name AS store_name,
+    STORES.city_address_id,
+    CALCULATED_ORDERS.store_type,
+    VERTICALS.group_,
+    VERTICALS.sub_group,    
+    CASE
+      WHEN VERTICALS.sub_group in ('Super','Hiper') THEN 'Super/Hiper'
+      WHEN VERTICALS.sub_group in ('Tecnologia','Tecnology','technology',	'tecnologia',	'Tecnología',
+'Mascotas','Sex shop','sex shop','sex_shop','Maquillaje','Moda','Servicios','Ropa','Gamers','Flores','Floristería','flowers',
+'Hogar','Belleza','Marcas','marcas') THEN 'Ecommerce'
+      WHEN VERTICALS.sub_group in ('Rappicash','Rappifavor','Restaurantes','Farmacia','Express','express','Licores','Antojos','CPGs') THEN VERTICALS.sub_group
+      WHEN VERTICALS.sub_group is null THEN 'Sin vertical'
+      ELSE 'Otro'
+    END AS VERTICAL,
+    STORES.address,
+    CODES.input_code,
+    'uy' AS country_id
+FROM uy_CORE_ORDERS_CALCULATED_INFORMATION.ORDERS_VW as CALCULATED_ORDERS  --ok
+LEFT JOIN uy_PGLR_MS_STORES_PUBLIC.stores_vw as STORES --ok 
+    ON CALCULATED_ORDERS.store_id::text =STORES.store_id::text
+    AND COALESCE(STORES._fivetran_deleted,false)=false
+LEFT JOIN VERTICALS 
+    ON VERTICALS.store_type::text = STORES.type::text and VERTICALS.country = 'uy'
+--LEFT JOIN CO_CORE_ORDERS_PUBLIC.ORDER_STORES
+    --ON ORDER_STORES.order_id = CALCULATED_ORDERS.order_id
+INNER JOIN uy_CORE_ORDERS_PUBLIC.ORDERS_VW as ORDERS  --ok
+    ON CALCULATED_ORDERS.ORDER_ID::text = ORDERS.ID::text
+LEFT JOIN uy_PG_MS_ORDER_HANDSHAKE_PUBLIC.codes AS CODES
+    ON CODES.order_id::text = CALCULATED_ORDERS.ORDER_ID::text
+LEFT JOIN ops_global.cancellation_reasons CANCELLATIONS
+   ON CANCELLATIONS.order_id::text = CALCULATED_ORDERS.order_id::text
+   AND lower(CANCELLATIONS.country) = 'uy'
+LEFT JOIN GLOBAL_FINANCES.TRM_FIXED  --/N/A
+  ON LOWER(TRM_FIXED.country_code::text) = 'uy'
+WHERE COALESCE(CALCULATED_ORDERS._fivetran_deleted,FALSE)<>TRUE
+AND ORDERS.created_at::date >= (dateadd(day, -7, (dateadd(hour, 0, current_timestamp()::date))))
+)
+
+ 
+  select --distinct 
+vw_liberacion.order_id,
+  vw_liberacion.country_id,
+  
+   vw_liberacion.created_at as fechas_lberacion,
+   tempcontrolreseasonroute.nivel2,
+   tempcontrolreseasonroute.nivel3 ,
+  -- rt_entragorn_productos.type as tipo_estado_entrega_poducto_rt,
+   --vw_liberacion.reasondesc as tipo_libracion_rt,
+
+
+-- LISTAGG(vw_liberacion.reasondesc, ',') WITHIN GROUP (ORDER BY vw_liberacion.reasondesc) AS tipo_libracion_rt,   
+
+vw_liberacion.agent_email,
+   
+    case when rt_entragorn_productos.order_id is not null 
+and vw_liberacion.created_at::timestamp >  rt_entragorn_productos.created_at::timestamp 
+and rt_entragorn_productos.type::text in ('rt_with_products','shopper_products_delivery_to_sk' ,'hand_to_domiciliary'  , 'delivery_to_rappitendero' ,'arrive' ,'payless_transaction_authorized')
+then 'Liberación incorrecta' else 'Liberación correcta'  end as tipifica_liberaciones,
+
+
+
+
+ storekeeper.id as store_keeper,
+storekeeper.TRANSPORT_MEDIA_TYPE,
+ 
+  GLOBAL_CANCELATION.state as estado_cancelacion,
+ order_calculated.group_ as vertical,
+  order_calculated.sub_group  as sub_vertical  
+   
+  from vw_liberacion
+  left join rt_entragorn_productos
+  on vw_liberacion.order_id::text = rt_entragorn_productos.order_id::text 
+  and vw_liberacion.country_id::text = rt_entragorn_productos.country_id::text
+  left join tempcontrolreseasonroute
+  on vw_liberacion.order_id::text = tempcontrolreseasonroute.order_id::text 
+  and vw_liberacion.country_id::text = tempcontrolreseasonroute.country_id::text
+  left join coreview
+  on vw_liberacion.order_id::text = coreview.id::text
+  and vw_liberacion.country_id::text = coreview.country_id::text
+  
+left join storekeeper
+ on storekeeper.id = coreview.storekeeper_id
+  and storekeeper.country_id::text = coreview.country_id::text
+
+
+ left join GLOBAL_CANCELATION
+ on vw_liberacion.order_id::text = GLOBAL_CANCELATION.id::text 
+  and vw_liberacion.country_id::text = GLOBAL_CANCELATION.country_id::text
+ left join order_calculated
+ on vw_liberacion.order_id::text = order_calculated.order_id::text 
+  and vw_liberacion.country_id::text = order_calculated.country_id::text
+
+  where vw_liberacion.created_at::date >= (dateadd(day, -7, (dateadd(hour, 0, current_timestamp()::date))))
+-->= (dateadd(day, -7, (dateadd(hour, 0, current_timestamp()::date))))
+
+group by vw_liberacion.order_id,
+  vw_liberacion.country_id,
+  
+   vw_liberacion.created_at ,
+   tempcontrolreseasonroute.nivel2,
+   tempcontrolreseasonroute.nivel3 ,
+   --rt_entragorn_productos.type ,
+   --vw_liberacion.reasondesc as tipo_libracion_rt,
+   
+vw_liberacion.agent_email,
+ case when rt_entragorn_productos.order_id is not null 
+and vw_liberacion.created_at::timestamp >  rt_entragorn_productos.created_at::timestamp 
+and rt_entragorn_productos.type::text in ('rt_with_products','shopper_products_delivery_to_sk' ,'hand_to_domiciliary'  , 'delivery_to_rappitendero' ,'arrive' ,'payless_transaction_authorized')
+then 'Liberación incorrecta' else 'Liberación correcta'  end,
+  
+storekeeper.TRANSPORT_MEDIA_TYPE,
+  storekeeper.id,
+---base.level_name,
+  GLOBAL_CANCELATION.state,
+ order_calculated.group_,
+  order_calculated.sub_group

@@ -1,0 +1,574 @@
+with frt_chat as (
+SELECT CHATS.order_id,CHATS.name, 
+DATEADD(HOUR, -8,CHATS.created_at) as created_chat,
+  chats.created_at,
+CHATS.chat_type, CHATS.sender_type, CHATS.receiver_type, 
+'co' as country, CHATS.data, 'CHAT_SUPPORT_CLIENT' as risk, users.email
+FROM informatica.co_pg_ms_realtime_interface_public.chats --co_pg_ms_realtime_interface_public.chats CHATS -- ok 
+left JOIN co_grability_public.users_vw users
+ON users.ID = CHATS.sender_id
+WHERE CHATS.name not in ( 'support','Soporte','Support Bot','Suporte') AND   CHATS.sender_type = 'support' AND CHATS.created_at::date >='2021-09-01'
+QUALIFY row_number() over(partition by CHATS.order_id order by CHATS.created_at asc) = 1
+
+UNION ALL
+
+SELECT CHATS.order_id,CHATS.name, 
+DATEADD(HOUR, -8,CHATS.created_at) as created_chat,
+  chats.created_at,
+CHATS.chat_type, CHATS.sender_type, CHATS.receiver_type, 
+'pe' as country, CHATS.data, 'CHAT_SUPPORT_CLIENT' as risk, users.email
+FROM pe_pg_ms_realtime_interface_public.chats CHATS -- ok 
+left JOIN  pe_grability_public.users_vw users
+          ON users.ID = CHATS.sender_id
+WHERE CHATS.name not in ( 'support','Soporte','Support Bot','Suporte') AND   CHATS.sender_type = 'support' AND CHATS.created_at::date >='2021-09-01'
+QUALIFY row_number() over(partition by CHATS.order_id order by CHATS.created_at asc) = 1
+UNION ALL
+
+SELECT CHATS.order_id,CHATS.name, 
+DATEADD(HOUR, -8,CHATS.created_at) as created_chat,
+  chats.created_at,
+CHATS.chat_type, CHATS.sender_type, CHATS.receiver_type, 
+'ec' as country, CHATS.data, 'CHAT_SUPPORT_CLIENT' as risk, users.email
+FROM ec_pg_ms_realtime_interface_public.chats CHATS -- ok 
+left JOIN  ec_grability_public.users_vw users
+          ON users.ID = CHATS.sender_id
+WHERE CHATS.name not in ( 'support','Soporte','Support Bot','Suporte') AND   CHATS.sender_type = 'support' AND CHATS.created_at::date >='2021-09-01'
+QUALIFY row_number() over(partition by CHATS.order_id order by CHATS.created_at asc) = 1
+
+UNION ALL
+
+SELECT CHATS.order_id,CHATS.name, 
+DATEADD(HOUR, -1,CHATS.created_at) as created_chat,
+  chats.created_at,
+CHATS.chat_type, CHATS.sender_type, CHATS.receiver_type, 
+'mx' as country, CHATS.data, 'CHAT_SUPPORT_CLIENT' as risk, users.email
+FROM mx_pg_ms_realtime_interface_public.chats CHATS -- ok
+left JOIN  mx_grability_public.users_vw users
+          ON users.ID = CHATS.sender_id
+WHERE CHATS.name not in ( 'support','Soporte','Support Bot','Suporte') AND   CHATS.sender_type = 'support' AND CHATS.created_at::date >='2021-09-01'
+QUALIFY row_number() over(partition by CHATS.order_id order by CHATS.created_at asc) = 1
+
+UNION ALL
+
+SELECT CHATS.order_id,CHATS.name, 
+DATEADD(HOUR, -3,CHATS.created_at) as created_chat,
+  chats.created_at,
+CHATS.chat_type, CHATS.sender_type, CHATS.receiver_type, 
+'uy' as country, CHATS.data, 'CHAT_SUPPORT_CLIENT' as risk ,users.email
+FROM uy_pg_ms_realtime_interface_public.chats CHATS -- ok
+left JOIN uy_grability_public.users_vw users
+          ON users.ID = CHATS.sender_id
+WHERE CHATS.name not in ( 'support','Soporte','Support Bot','Suporte') AND   CHATS.sender_type = 'support' AND CHATS.created_at::date >='2021-09-01'
+QUALIFY row_number() over(partition by CHATS.order_id order by CHATS.created_at asc) = 1
+
+UNION ALL
+
+SELECT CHATS.order_id,CHATS.name, 
+DATEADD(HOUR, -9,CHATS.created_at) as created_chat, 
+  chats.created_at,
+CHATS.chat_type, CHATS.sender_type, CHATS.receiver_type, 
+'cr' as country, CHATS.data, 'CHAT_SUPPORT_CLIENT' as risk ,users.email
+FROM cr_pg_ms_realtime_interface_public.chats CHATS -- ok 
+left JOIN  cr_grability_public.users_vw users
+          ON users.ID = CHATS.sender_id
+WHERE CHATS.name not in ( 'support','Soporte','Support Bot','Suporte') AND   CHATS.sender_type = 'support' AND CHATS.created_at::date >='2021-09-01'
+QUALIFY row_number() over(partition by CHATS.order_id order by CHATS.created_at asc) = 1
+
+UNION ALL
+
+SELECT CHATS.order_id,CHATS.name, 
+CHATS.created_at as created_chat, 
+  chats.created_at,
+
+CHATS.chat_type, CHATS.sender_type, CHATS.receiver_type, 
+'cl' as country, CHATS.data, 'CHAT_SUPPORT_CLIENT' as risk ,users.email
+FROM cl_pg_ms_realtime_interface_public.chats CHATS -- ok
+left JOIN  cl_grability_public.users_vw users
+          ON users.ID = CHATS.sender_id
+WHERE CHATS.name not in ( 'support','Soporte','Support Bot','Suporte') AND   CHATS.sender_type = 'support' AND CHATS.created_at::date >='2021-09-01'
+QUALIFY row_number() over(partition by CHATS.order_id order by CHATS.created_at asc) = 1
+UNION ALL
+
+SELECT CHATS.order_id,CHATS.name, 
+DATEADD(HOUR, -6,CHATS.created_at) as created_chat,
+  chats.created_at,
+CHATS.chat_type, CHATS.sender_type, CHATS.receiver_type, 
+'ar' as country, CHATS.data, 'CHAT_SUPPORT_CLIENT' as risk ,users.email
+FROM ar_pg_ms_realtime_interface_public.chats CHATS -- ok 
+left JOIN  ar_grability_public.users_vw users
+          ON users.ID = CHATS.sender_id
+WHERE CHATS.name not in ( 'support','Soporte','Support Bot','Suporte') AND   CHATS.sender_type = 'support' AND CHATS.created_at::date >='2021-09-01'
+QUALIFY row_number() over(partition by CHATS.order_id order by CHATS.created_at asc) = 1
+
+UNION ALL
+
+SELECT CHATS.order_id,CHATS.name, 
+DATEADD(HOUR, -6,CHATS.created_at) as created_chat, 
+  chats.created_at,
+CHATS.chat_type, CHATS.sender_type, CHATS.receiver_type, 
+'br' as country, CHATS.data, 'CHAT_SUPPORT_CLIENT' as risk ,users.email
+FROM br_pg_ms_realtime_interface_public.chats CHATS -- ok
+left JOIN br_grability_public.users_vw users
+          ON users.ID = CHATS.sender_id
+WHERE CHATS.name not in ( 'support','Soporte','Support Bot','Suporte') AND   CHATS.sender_type = 'support' AND CHATS.created_at::date >='2021-09-01'
+QUALIFY row_number() over(partition by CHATS.order_id order by CHATS.created_at asc) = 1
+  ),
+
+frt_not_chat as (
+SELECT CHATS.order_id,CHATS.name, 
+DATEADD(HOUR, -8,CHATS.created_at) as created_chat,
+CHATS.chat_type, CHATS.sender_type, CHATS.receiver_type, 
+'co' as country, CHATS.data, 'CHAT_SUPPORT_CLIENT' as risk, users.email,convert_timezone('UTC',CHATS.created_at) as created_chat_utc
+FROM informatica.co_pg_ms_realtime_interface_public.chats --co_pg_ms_realtime_interface_public.chats CHATS -- ok 
+left JOIN co_grability_public.users_vw users
+ON users.ID = CHATS.sender_id
+
+inner join frt_chat
+on chats.order_id = frt_chat.order_id and 'co' = frt_chat.country and chats.created_at > frt_chat.created_at
+WHERE CHATS.name not in ( 'support','Soporte','Support Bot','Suporte') AND   CHATS.sender_type = 'support' AND CHATS.created_at::date >='2021-09-01'
+--QUALIFY row_number() over(partition by CHATS.order_id order by CHATS.created_at asc) = 1
+
+UNION ALL
+
+SELECT CHATS.order_id,CHATS.name, 
+DATEADD(HOUR, -8,CHATS.created_at) as created_chat,
+CHATS.chat_type, CHATS.sender_type, CHATS.receiver_type, 
+'pe' as country, CHATS.data, 'CHAT_SUPPORT_CLIENT' as risk, users.email,convert_timezone('UTC',CHATS.created_at) as created_chat_utc
+FROM pe_pg_ms_realtime_interface_public.chats CHATS -- ok 
+left JOIN  pe_grability_public.users_vw users
+          ON users.ID = CHATS.sender_id
+
+inner join frt_chat
+on chats.order_id = frt_chat.order_id and 'pe' = frt_chat.country and chats.created_at > frt_chat.created_at
+WHERE CHATS.name not in ( 'support','Soporte','Support Bot','Suporte') AND   CHATS.sender_type = 'support' AND CHATS.created_at::date >='2021-09-01'
+--QUALIFY row_number() over(partition by CHATS.order_id order by CHATS.created_at asc) = 1
+UNION ALL
+
+SELECT CHATS.order_id,CHATS.name, 
+DATEADD(HOUR, -8,CHATS.created_at) as created_chat,
+CHATS.chat_type, CHATS.sender_type, CHATS.receiver_type, 
+'ec' as country, CHATS.data, 'CHAT_SUPPORT_CLIENT' as risk, users.email,convert_timezone('UTC',CHATS.created_at) as created_chat_utc
+FROM ec_pg_ms_realtime_interface_public.chats CHATS -- ok 
+left JOIN  ec_grability_public.users_vw users
+          ON users.ID = CHATS.sender_id
+
+inner join frt_chat
+on chats.order_id = frt_chat.order_id and 'ec' = frt_chat.country and chats.created_at > frt_chat.created_at
+WHERE CHATS.name not in ( 'support','Soporte','Support Bot','Suporte') AND   CHATS.sender_type = 'support' AND CHATS.created_at::date >='2021-09-01'
+--QUALIFY row_number() over(partition by CHATS.order_id order by CHATS.created_at asc) = 1
+
+UNION ALL
+
+SELECT CHATS.order_id,CHATS.name, 
+DATEADD(HOUR, -1,CHATS.created_at) as created_chat,
+CHATS.chat_type, CHATS.sender_type, CHATS.receiver_type, 
+'mx' as country, CHATS.data, 'CHAT_SUPPORT_CLIENT' as risk, users.email,convert_timezone('UTC',CHATS.created_at) as created_chat_utc
+FROM mx_pg_ms_realtime_interface_public.chats CHATS -- ok
+left JOIN  mx_grability_public.users_vw users
+          ON users.ID = CHATS.sender_id
+
+inner join frt_chat
+on chats.order_id = frt_chat.order_id and 'mx' = frt_chat.country and chats.created_at > frt_chat.created_at
+WHERE CHATS.name not in ( 'support','Soporte','Support Bot','Suporte') AND   CHATS.sender_type = 'support' AND CHATS.created_at::date >='2021-09-01'
+--QUALIFY row_number() over(partition by CHATS.order_id order by CHATS.created_at asc) = 1
+
+UNION ALL
+
+SELECT CHATS.order_id,CHATS.name, 
+DATEADD(HOUR, -3,CHATS.created_at) as created_chat,
+CHATS.chat_type, CHATS.sender_type, CHATS.receiver_type, 
+'uy' as country, CHATS.data, 'CHAT_SUPPORT_CLIENT' as risk ,users.email,convert_timezone('UTC',CHATS.created_at) as created_chat_utc
+FROM uy_pg_ms_realtime_interface_public.chats CHATS -- ok
+left JOIN uy_grability_public.users_vw users
+          ON users.ID = CHATS.sender_id
+
+inner join frt_chat
+on chats.order_id = frt_chat.order_id and 'uy' = frt_chat.country and chats.created_at > frt_chat.created_at
+WHERE CHATS.name not in ( 'support','Soporte','Support Bot','Suporte') AND   CHATS.sender_type = 'support' AND CHATS.created_at::date >='2021-09-01'
+--QUALIFY row_number() over(partition by CHATS.order_id order by CHATS.created_at asc) = 1
+
+UNION ALL
+
+SELECT CHATS.order_id,CHATS.name, 
+DATEADD(HOUR, -9,CHATS.created_at) as created_chat, 
+CHATS.chat_type, CHATS.sender_type, CHATS.receiver_type, 
+'cr' as country, CHATS.data, 'CHAT_SUPPORT_CLIENT' as risk ,users.email,convert_timezone('UTC',CHATS.created_at) as created_chat_utc
+FROM cr_pg_ms_realtime_interface_public.chats CHATS -- ok 
+left JOIN  cr_grability_public.users_vw users
+          ON users.ID = CHATS.sender_id
+
+inner join frt_chat
+on chats.order_id = frt_chat.order_id and 'cr' = frt_chat.country and chats.created_at > frt_chat.created_at
+WHERE CHATS.name not in ( 'support','Soporte','Support Bot','Suporte') AND   CHATS.sender_type = 'support' AND CHATS.created_at::date >='2021-09-01'
+--QUALIFY row_number() over(partition by CHATS.order_id order by CHATS.created_at asc) = 1
+
+UNION ALL
+
+SELECT CHATS.order_id,CHATS.name, 
+CHATS.created_at as created_chat, 
+
+CHATS.chat_type, CHATS.sender_type, CHATS.receiver_type, 
+'cl' as country, CHATS.data, 'CHAT_SUPPORT_CLIENT' as risk ,users.email,convert_timezone('UTC',CHATS.created_at) as created_chat_utc
+FROM cl_pg_ms_realtime_interface_public.chats CHATS -- ok
+left JOIN  cl_grability_public.users_vw users
+          ON users.ID = CHATS.sender_id
+
+inner join frt_chat
+on chats.order_id = frt_chat.order_id and 'cl' = frt_chat.country and chats.created_at > frt_chat.created_at
+WHERE CHATS.name not in ( 'support','Soporte','Support Bot','Suporte') AND   CHATS.sender_type = 'support' AND CHATS.created_at::date >='2021-09-01'
+--QUALIFY row_number() over(partition by CHATS.order_id order by CHATS.created_at asc) = 1
+UNION ALL
+
+SELECT CHATS.order_id,CHATS.name, 
+DATEADD(HOUR, -6,CHATS.created_at) as created_chat, 
+CHATS.chat_type, CHATS.sender_type, CHATS.receiver_type, 
+'ar' as country, CHATS.data, 'CHAT_SUPPORT_CLIENT' as risk ,users.email,convert_timezone('UTC',CHATS.created_at) as created_chat_utc
+FROM ar_pg_ms_realtime_interface_public.chats CHATS -- ok 
+left JOIN  ar_grability_public.users_vw users
+          ON users.ID = CHATS.sender_id
+
+inner join frt_chat
+on chats.order_id = frt_chat.order_id and 'ar' = frt_chat.country and chats.created_at > frt_chat.created_at
+WHERE CHATS.name not in ( 'support','Soporte','Support Bot','Suporte') AND   CHATS.sender_type = 'support' AND CHATS.created_at::date >='2021-09-01'
+--QUALIFY row_number() over(partition by CHATS.order_id order by CHATS.created_at asc) = 1
+
+UNION ALL
+
+SELECT CHATS.order_id,CHATS.name, 
+DATEADD(HOUR, -6,CHATS.created_at) as created_chat, 
+CHATS.chat_type, CHATS.sender_type, CHATS.receiver_type, 
+'br' as country, CHATS.data, 'CHAT_SUPPORT_CLIENT' as risk ,users.email,convert_timezone('UTC',CHATS.created_at) as created_chat_utc
+FROM br_pg_ms_realtime_interface_public.chats CHATS -- ok
+left JOIN br_grability_public.users_vw users
+          ON users.ID = CHATS.sender_id
+
+inner join frt_chat
+on chats.order_id = frt_chat.order_id and 'br' = frt_chat.country and chats.created_at > frt_chat.created_at
+WHERE CHATS.name not in ( 'support','Soporte','Support Bot','Suporte') AND   CHATS.sender_type = 'support' AND CHATS.created_at::date >='2021-09-01'
+--QUALIFY row_number() over(partition by CHATS.order_id order by CHATS.created_at asc) = 1
+  ),
+max_frt_detail as (
+select 
+ORDER_BAG.order_id,
+ORDER_BAG.country_id,
+frt_not_chat.created_chat,
+
+
+case when country_id = 'co' then dateadd(hour, -5 ,ORDER_BAG.created_at)
+         when country_id = 'mx' then dateadd(hour, -6 ,ORDER_BAG.created_at)
+         when country_id = 'ar' then dateadd(hour, -3 ,ORDER_BAG.created_at)
+         when country_id = 'bo' then dateadd(hour, -4 ,ORDER_BAG.created_at)
+         when country_id = 'br' then dateadd(hour, -3 ,ORDER_BAG.created_at) 
+         when country_id = 'cl' then dateadd(hour, -3 ,ORDER_BAG.created_at) 
+         when country_id = 'cr' then dateadd(hour, -6 ,ORDER_BAG.created_at) 
+         when country_id = 'ec' then dateadd(hour, -5 ,ORDER_BAG.created_at) 
+         when country_id = 'pe' then dateadd(hour, -5 ,ORDER_BAG.created_at) 
+         when country_id = 'uy' then dateadd(hour, -2 ,ORDER_BAG.created_at) 
+         else ORDER_BAG.created_at end as  fechas_paises_restas,
+     
+        DATEDIFF('SECONDS',fechas_paises_restas::timestamp,frt_not_chat.created_chat::timestamp)/60 as maxresponsetime
+
+from CO_PG_MS_SUPPORT_ASSIGNER_PUBLIC.ORDER_BAG
+inner join frt_not_chat
+on ORDER_BAG.order_id = frt_not_chat.order_id and ORDER_BAG.country_id = frt_not_chat.country
+where fechas_paises_restas::date >= '2021-09-01'  
+  
+),
+max_frt as (
+select max_frt_detail.order_id,
+max_frt_detail.country_id,
+max(maxresponsetime) as  maxresponsetime
+
+from max_frt_detail
+
+group by max_frt_detail.order_id,
+max_frt_detail.country_id
+),
+temp_risk as (
+select
+live_tickets_details_v2.country,
+   live_tickets_details_v2.ORDER_BAG_ID::text as ORDER_BAG_ID,
+live_tickets_details_v2.ORDER_ID::text as ORDER_ID,
+live_tickets_details_v2.role_id::text as role_id,
+  ORDER_BAG_CONTROLLED_BY,
+ORDER_BAG_CREATED_AT::date as fechas_pais_restas_date,
+trim(VALUE,'"\[]"') as risk,
+ORDER_BAG_ID::text as cantidad_riesgos,
+live_tickets_details_v2.USER_TYPE
+from ops_global.live_tickets_details_v2,
+LATERAL FLATTEN (INPUT => SPLIT(risks,'"_"')) s
+--group by role_id,fechas_pais_restas_date, risk,live_tickets_details_v2.country,ORDER_BAG_CONTROLLED_BY
+  where ORDER_BAG_CREATED_AT::date >= (dateadd(day, -30, (dateadd(hour, 0, current_timestamp()::date))))
+  ),
+tempcontrolreseasonroute as (
+ select ORDER_ID::text as ORDER_ID,
+  ID::text AS ORDER_BAG_ID,
+COUNTRY_ID,
+REGEXP_REPLACE(split_part(ORDER_BAG.CONTROL_REASONS_ROUTE, '&',  1),'[0-9]', '')  as tipousuario,
+REGEXP_REPLACE(split_part(ORDER_BAG.CONTROL_REASONS_ROUTE, '&',  2),'[0-9]', '')  as nivel1,
+REGEXP_REPLACE(split_part(ORDER_BAG.CONTROL_REASONS_ROUTE, '&',  3),'[0-9]', '')  as nivel2,
+REGEXP_REPLACE(split_part(ORDER_BAG.CONTROL_REASONS_ROUTE, '&',  4),'[0-9]', '')  as nivel3 ,
+REGEXP_REPLACE(CONTROL_REASONS_KEY,'[0-9]', '') as CONTROL_REASONS_KEY,
+REGEXP_REPLACE(CONTROL_REASONS_ROUTE,'[0-9]', '') as CONTROL_REASONS_ROUTE
+ from CO_PG_MS_SUPPORT_ASSIGNER_PUBLIC.ORDER_BAG
+ where created_at::date >= (dateadd(day, -30, (dateadd(hour, 0, current_timestamp()::date))))
+  ),
+RISK_CONFIGURATION AS (
+  SELECT
+    ORDER_BAG_CONFIGS.order_bag_id,
+    CONFIGS.role_id,
+    lupe_roles.name AS BAG_NAME,
+    CONFIG_ROLES.SERVICE,
+    CONFIG_ROLES.LANGUAGE,
+    CONFIG_ROLES.PARTNER_BPO,
+    CONFIG_ROLES.MANAGED_BY_BPO,
+    CONFIG_ROLES.IS_KPI
+    --CONFIG_ROLES.ID
+  FROM  CO_PG_MS_SUPPORT_ASSIGNER_PUBLIC.ORDER_BAG_CONFIGS ORDER_BAG_CONFIGS --ok
+  LEFT JOIN CO_PG_MS_SUPPORT_ASSIGNER_PUBLIC.CONFIGS CONFIGS --ok
+    ON ORDER_BAG_CONFIGS.CONFIG_ID = CONFIGS.ID
+  LEFT JOIN gsheets.roles_orders_bag_support CONFIG_ROLES --ok
+    ON CONFIG_ROLES.ID = CONFIGS.ROLE_ID
+  LEFT JOIN CO_PG_MS_SUPPORT_ASSIGNER_PUBLIC.roles lupe_roles ON CONFIGS.role_id =  lupe_roles.id --ok
+  WHERE
+    COALESCE(ORDER_BAG_CONFIGS._fivetran_deleted,FALSE) != TRUE
+  AND ORDER_BAG_CONFIGS.created_at::date >='2021-09-01'
+  QUALIFY ROW_NUMBER() OVER (PARTITION BY
+                                ORDER_BAG_CONFIGS.order_bag_id
+                               ORDER BY
+                                CONFIGS.priority ASC,
+                                ORDER_BAG_CONFIGS.created_at DESC)=1
+),
+
+ live_macros_pre as (
+        select
+            try_cast (audit_macros.order_id as int) as order_id,
+            array_agg(macros.message) within group (order by audit_macros.created_at asc) as macros
+        from mx_pg_lupe_support.audit_macros
+            inner join mx_pg_lupe_support.macros on (audit_macros.macro_id = macros.id)
+            inner join ops_global.live_tickets_details_v2 ticket on (ticket.order_id = try_cast(audit_macros.order_id as int))
+        where
+            not coalesce (audit_macros._fivetran_deleted, false)
+            and not coalesce (macros._fivetran_deleted, false)
+        group by
+            1
+    ),
+
+    live_macros as (
+        select distinct
+            'Lupe' as center,
+            ticket.country,
+            ticket.order_bag_id::text as ticket_id,
+            ticket.order_bag_created_at as macro_created_at,
+            ticket.order_id,
+            coalesce(ticket.country, 'null') || order_bag_id::text as ticket_key,
+            coalesce(live_macros_pre.macros, to_array('Null')) as macros_array,
+            case when live_macros_pre.macros is null then False else True end as macro_used,
+            case when value = 'Null' then Null else value::text end as macros
+        from ops_global.live_tickets_details_v2 ticket
+        left join live_macros_pre on live_macros_pre.order_id = ticket.order_id,
+        table (flatten(live_macros_pre.macros))
+    ),
+     automation_logs as (
+select 'BR' as country,* from BR_PG_MS_RISK_ORCHESTRATOR_PUBLIC.automation_logs
+union all
+select 'CO' as country,* from CO_PG_MS_RISK_ORCHESTRATOR_PUBLIC.automation_logs
+union all
+select 'MX' as country,* from MX_PG_MS_RISK_ORCHESTRATOR_PUBLIC.automation_logs
+union all
+select 'AR' as country, * from AR_PG_MS_RISK_ORCHESTRATOR_PUBLIC.automation_logs
+union all
+select 'CL' as country,* from CL_PG_MS_RISK_ORCHESTRATOR_PUBLIC.automation_logs
+union all
+select 'EC' as country,* from EC_PG_MS_RISK_ORCHESTRATOR_PUBLIC.automation_logs
+union all
+select 'PE' as country,* from PE_PG_MS_RISK_ORCHESTRATOR_PUBLIC.automation_logs
+union all
+select 'UY' as country,* from UY_PG_MS_RISK_ORCHESTRATOR_PUBLIC.automation_logs
+union all
+select 'CR' as country,* from CR_PG_MS_RISK_ORCHESTRATOR_PUBLIC.automation_logs
+  )
+  
+,cts as (
+select id,
+  order_id,
+country,
+created_at::date as day,
+case
+when risk_type in ('NOTIFICATION_RT_CANNOT_CHANGE_STATE') then 'Change state'
+when risk_type in ('NOTIFICATION_RT_CUSTOMER_NOT_COME_OUT_V3') then 'Client doesn''t go out'
+when risk_type in ('NOTIFICATION_RT_EMERGENCY_DISPERSION') then 'Emergency dispersion'
+when risk_type in ('NOTIFICATION_RT_ORDER_NOT_CLOSED_V3') then 'Close order'
+when risk_type in ('NOTIFICATION_RT_PROBLEMS_WITH_RESTAURANT_LATE') then 'Ally delay'
+when risk_type in ('NOTIFICATION_RT_RELEASE_ORDER_V3_ACCIDENT') then 'Release accident'
+when risk_type in ('NOTIFICATION_RT_REQUEST_HELP_VERIFICATION_CODE') then 'Skip handshake'
+when risk_type in ('NOTIFICATION_RT_HELP_WITH_LARGE_ORDER') then 'Help with large order'
+else 'Other' end as contact_reason,
+resolution_type
+
+from automation_logs
+  
+where created_at::date>=current_date-63
+and risk_type in ('NOTIFICATION_RT_CANNOT_CHANGE_STATE','NOTIFICATION_RT_CUSTOMER_NOT_COME_OUT_V3','NOTIFICATION_RT_EMERGENCY_DISPERSION','NOTIFICATION_RT_ORDER_NOT_CLOSED_V3','NOTIFICATION_RT_PROBLEMS_WITH_RESTAURANT_LATE','NOTIFICATION_RT_RELEASE_ORDER_V3_ACCIDENT','NOTIFICATION_RT_REQUEST_HELP_VERIFICATION_CODE','NOTIFICATION_RT_HELP_WITH_LARGE_ORDER')
+group by 1,2,3,4,5,6
+order by 1
+)
+
+SELECT
+  CAST(created_at_co AS DATE) AS created_at,
+  country_id,
+  creation_interval,
+  vw_partner_support_order_bag_actual.controlled_by,
+   risk,
+  tipousuario,
+nivel1,
+nivel2,
+nivel3,
+  BPO,
+  case when controlled_by is null then 'open' else 'done' end as status,
+  case when controlled_by ilike '%@rappi%' then 'not_automated' else controlled_by end as controlleby,
+  COUNT(distinct orderbag_id) AS risks,
+  SUM(NA) AS controlled_risks,
+  COUNT(DISTINCT(ControLled_by)) AS Agents,
+  case
+    when AVG(viewed_time) <0 then 0
+    else AVG(viewed_time)
+  end AS ASA,
+  AVG(handle_time) AS AHT,
+  AVG(resolution_time) AS resolution_time,
+  AVG(sla) AS SLA,
+  AVG(sla30segundos) AS SLA30SEGUNDOS,
+  AVG(NA) AS NA,
+  sum(reopen) AS Reopencalculo,
+  1- AVG(reopen) AS FCR,
+  orderbag_id,
+  BAG_NAME,
+  live_macros.macros,
+  live_macros.macro_used,
+  case when cts.resolution_type = 'BOTH' then 'BOTH' end as resolution_type_BOTH,
+  case when cts.resolution_type = 'AGENT' then 'AGENT' end as resolution_type_AGENT,
+  case when cts.resolution_type = 'AUTO' then 'AUTO' end as resolution_type_AUTO,
+ case when avg(maxresponsetime) < 0 then 0 else avg(maxresponsetime) end as max_frt
+
+
+FROM
+  (
+SELECT
+   ORDER_BAG.id as orderbag_id
+  , ORDER_BAG.order_id order_id
+  , ORDER_BAG.country_id::text country_id
+    ,temp_risk.risk
+ , tempcontrolreseasonroute.tipousuario
+,tempcontrolreseasonroute.nivel1
+,tempcontrolreseasonroute.nivel2
+,tempcontrolreseasonroute.nivel3
+--  , core_orders.APPLICATION_USER_ID
+--  , orders_calculated_info.vertical
+--  , orders_calculated_info.store_type
+  , ORDER_BAG.user_id::text user_id
+  , ORDER_BAG.current_risks::TEXT risks
+  , (dateadd(hour, -5, ORDER_BAG.created_at)) created_at_co
+  , (dateadd(hour, -5, ORDER_BAG.viewed_at)) viewed_at
+  , (dateadd(hour, -5, ORDER_BAG.controlled_at)) controlled_at
+  , ORDER_BAG.controlled_by
+  , COALESCE(ORDER_BAG.role_id, RISK_CONFIGURATION.role_id) role_id
+  , ORDER_BAG.config_id
+  ,COALESCE(ROLES.SERVICE, COALESCE(RISK_CONFIGURATION.SERVICE, 'Otro')) ROLE_NAME
+  , COALESCE(ROLES.LANGUAGE,RISK_CONFIGURATION.LANGUAGE, 'Otro') AS LENGUAJE
+  , COALESCE(lupe_roles.NAME, COALESCE(RISK_CONFIGURATION.BAG_NAME, 'Otro')) AS BAG_NAME
+  , DATEDIFF('SECONDS', (dateadd(hour, -5, ORDER_BAG.created_at)), (dateadd(hour, -5, ORDER_BAG.viewed_at)))/60 AS viewed_time
+  , DATEDIFF('SECONDS', (dateadd(hour, -5, ORDER_BAG.viewed_at)), (dateadd(hour, -5, ORDER_BAG.controlled_at)))/60 AS handle_time
+  , CASE
+      WHEN  (dateadd(hour, -5, ORDER_BAG.viewed_at)) IS NOT NULL THEN
+        DATEDIFF('SECONDS', (dateadd(hour, -5, ORDER_BAG.created_at)), (dateadd(hour, -5, ORDER_BAG.controlled_at)))/60
+      END AS resolution_time
+  , IFF(DATEDIFF('SECONDS', (dateadd(hour, -5, ORDER_BAG.created_at)), (dateadd(hour, -5, ORDER_BAG.viewed_at))) <= 180 AND ORDER_BAG.CONTROLLED_BY IS NOT NULL, 1, 0) AS sla
+  , IFF(DATEDIFF('SECONDS', (dateadd(hour, -5, ORDER_BAG.created_at)), (dateadd(hour, -5, ORDER_BAG.viewed_at))) <= 60 AND ORDER_BAG.CONTROLLED_BY IS NOT NULL, 1, 0) AS sla1min
+  , IFF(DATEDIFF('SECONDS', (dateadd(hour, -5, ORDER_BAG.created_at)), (dateadd(hour, -5, ORDER_BAG.viewed_at))) <= 120 AND ORDER_BAG.CONTROLLED_BY IS NOT NULL, 1, 0) AS sla2min
+  , IFF(DATEDIFF('SECONDS', (dateadd(hour, -5, ORDER_BAG.created_at)), (dateadd(hour, -5, ORDER_BAG.viewed_at))) <= 30 AND ORDER_BAG.CONTROLLED_BY IS NOT NULL, 1, 0) AS sla30segundos
+  ,IFF(ORDER_BAG.CONTROLLED_BY IS NOT NULL
+       AND ORDER_BAG.CONTROLLED_BY NOT IN ('order_closed','order_canceled'), 1,0) AS NA
+  , CASE
+      WHEN NOT (LEAD(ORDER_BAG.id) OVER(PARTITION BY ORDER_BAG.order_id, ORDER_BAG.COUNTRY_ID, ORDER_BAG.role_id ORDER BY (dateadd(hour, -5, ORDER_BAG.created_at)))) IS NULL
+        THEN 1
+        ELSE 0
+      END AS reopen
+  , TO_VARCHAR(HOUR((dateadd(hour, -5, ORDER_BAG.created_at))),'00') AS creation_hour
+  , TO_VARCHAR(HOUR((dateadd(hour, -5, ORDER_BAG.created_at))),'00') || CASE
+      WHEN TO_CHAR((dateadd(hour, -5, ORDER_BAG.created_at)), 'MI') >= 30
+        THEN ':30'
+        ELSE ':00'
+      END AS creation_interval
+  , TO_VARCHAR(HOUR((dateadd(hour, -5, ORDER_BAG.controlled_at))),'00') || CASE
+      WHEN TO_CHAR(CONTROLLED_AT, 'MI') >= 30
+        THEN ':30'
+        ELSE ':00'
+      END AS resolution_interval
+ , TO_VARCHAR(HOUR((dateadd(hour, -5, ORDER_BAG.controlled_at))),'00') AS resolution_hour
+, COALESCE(ROLES.PARTNER_BPO, RISK_CONFIGURATION.PARTNER_BPO ,'Sin Identificar') AS BPO
+, COALESCE(ROLES.IS_KPI, RISK_CONFIGURATION.IS_KPI ,'Sin Identificar') as IS_KPI
+,COALESCE(ROLES.MANAGED_BY_BPO , RISK_CONFIGURATION.MANAGED_BY_BPO  ,'Sin Identificar') as MANAGED_BY_BPO
+       ,max_frt.maxresponsetime
+FROM CO_PG_MS_SUPPORT_ASSIGNER_PUBLIC.ORDER_BAG ORDER_BAG -- N/A
+LEFT JOIN RISK_CONFIGURATION
+ ON RISK_CONFIGURATION.order_bag_id = ORDER_BAG.id
+LEFT JOIN gsheets.roles_orders_bag_support ROLES  -- ok
+  ON ORDER_BAG.role_id = ROLES.id
+LEFT JOIN CO_PG_MS_SUPPORT_ASSIGNER_PUBLIC.roles lupe_roles ON ORDER_BAG.role_id = lupe_roles.id  -- ok
+LEFT JOIN temp_risk
+ON temp_risk.ORDER_BAG_ID::text = ORDER_BAG.id::TEXT
+LEFT JOIN tempcontrolreseasonroute
+ON tempcontrolreseasonroute.ORDER_BAG_ID::text = ORDER_BAG.id::TEXT
+left join max_frt
+on ORDER_BAG.order_id = max_frt.order_id and ORDER_BAG.country_id = max_frt.country_id 
+    
+/*LEFT JOIN [vw_core_orders AS core_orders]  -- ok
+     ON core_orders.id=ORDER_BAG.order_id
+     AND core_orders.country_id = ORDER_BAG.country_id*/
+/*LEFT JOIN [vw_orders_calculated_info AS orders_calculated_info] -- ok
+     ON orders_calculated_info.order_id=ORDER_BAG.order_id
+     AND orders_calculated_info.country_id= ORDER_BAG.country_id*/
+WHERE
+    --COALESCE(ORDER_BAG.controlled_by,FALSE) <> 'system'
+    COALESCE(ORDER_BAG._fivetran_deleted,FALSE) != TRUE
+    AND ORDER_BAG.ROLE_ID IN (2222956,
+2222998,
+2223013,
+2223036,
+2223054,
+2223019,
+2222970)
+    AND ORDER_BAG.created_at::date >='2021-09-01'
+  
+  ) as vw_partner_support_order_bag_actual
+  
+ left join live_macros
+ on vw_partner_support_order_bag_actual.orderbag_id::text = live_macros.ticket_id::text
+ 
+ left join cts
+ on vw_partner_support_order_bag_actual.order_id::text = cts.order_id::text
+ and vw_partner_support_order_bag_actual.country_id = lower(cts.country)
+ 
+
+
+WHERE
+ created_at::date >= (dateadd(month, -3, (dateadd(hour, 0, current_timestamp()::date))))
+ 
+--created_at::date >= (dateadd(hour, 0, '2021-09-01'::date)) and created_at::date::DATE < (dateadd(day, 1, dateadd(hour, 0, '2021-12-31'::date)))
+GROUP BY
+     country_id, orderbag_id, BAG_NAME,CAST(created_at_co AS DATE),creation_interval, vw_partner_support_order_bag_actual.controlled_by  ,risk,
+  tipousuario,
+nivel1,
+nivel2,
+nivel3,
+BPO,
+controlleby,
+status,
+live_macros.macros,
+  live_macros.macro_used,
+  case when cts.resolution_type = 'BOTH' then 'BOTH' end,
+  case when cts.resolution_type = 'AGENT' then 'AGENT' end,
+  case when cts.resolution_type = 'AUTO' then 'AUTO' end
+
+  
+  
